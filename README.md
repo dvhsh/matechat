@@ -11,7 +11,6 @@ This currently relies on having a cloudflare worker running meta/llama-3-8b-inst
 - Run Desktop Mate and use F8 to open chat window
 
 # Planned Features
-- Integrate settings selection into Desktop Mate's settings menu
 - Allow user to pick from multiple LLM APIs
 - Allow user to input and store API keys via settings menu
 - Allow user to modify system prompt via settings menu
@@ -21,3 +20,7 @@ This currently relies on having a cloudflare worker running meta/llama-3-8b-inst
 - Proper JSON deserialization
 - Reworked error handling
 - Make the chat box nicer visually, maybe do some type of speech bubble response thing
+
+# In Progress
+- Integrate settings selection into Desktop Mate's settings menu
+- Adding menu transition and close animations (matechat currently can add a button to the menu, and clone the back/close buttons onto its own page)
