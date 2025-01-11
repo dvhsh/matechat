@@ -38,9 +38,6 @@ namespace matechat
         private string responseText = "";
         private bool isChatFocused = false;
 
-        private Vector2 scrollPosition = Vector2.zero;
-        private bool isDragging = false;
-        private Vector2 dragOffset;
         private Rect windowRect = new Rect(10, 10, 400, 400);
 
         public ChatFeature() : base("Chat", KeyCode.F8) { }
