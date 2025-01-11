@@ -137,13 +137,6 @@ namespace matechat
             GUI.backgroundColor = originalBgColor;
         }
 
-        private bool IsOverButtons(Vector2 mousePos)
-        {
-            Rect clearButtonRect = new Rect(windowRect.x + windowRect.width - 55, windowRect.y + 5, 50, 20);
-            Rect sendButtonRect = new Rect(windowRect.x + windowRect.width - 70, windowRect.y + windowRect.height - 35, 60, 25);
-            return clearButtonRect.Contains(mousePos) || sendButtonRect.Contains(mousePos);
-        }
-
         private void SendMessage()
         {
             if (string.IsNullOrEmpty(inputText) || isWaitingForResponse) return;
