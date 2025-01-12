@@ -13,6 +13,8 @@ You can easily setup a CloudFlare AI Worker and obtain your API_URL and API_KEY 
 - Edit UserData/MateChat.cfg to include your credentials and preferences
 - Run Desktop Mate and use assigned key to open the chat menu
 
+Please note that if you are to edit MateChat.cfg directly, you'll need to restart Desktop Mate for changes to take effect.
+
 # Planned Features
 - Allow user to pick from multiple LLM APIs
 - Allow user to input and store API keys via settings menu
