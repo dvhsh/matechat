@@ -3,8 +3,8 @@ using System.Text;
 
 using MelonLoader;
 
-using UnityEngine.Networking;
 using UnityEngine;
+using UnityEngine.Networking;
 
 using matechat.sdk.Feature;
 using matechat.util;
@@ -13,197 +13,279 @@ namespace matechat.feature
 {
     public class ChatFeature : Feature
     {
-         private bool isWaitingForResponse = false;
+        private bool isWaitingForResponse;
+        private string inputText = string.Empty;
+        private string responseText = string.Empty;
+        private bool isChatFocused;
+        private Vector2 scrollPosition;
 
-        private string inputText = "";
-        private string responseText = "";
-        private bool isChatFocused = false;
+        private readonly Rect windowRect = new Rect(
+            20, 
+            20,                
+            400,             
+            500               
+        );
 
-        private Rect windowRect = new Rect(10, 10, 400, 400);
+        private static readonly Color MikuTeal = new Color(0.07f, 0.82f, 0.82f, 0.95f);
+        private static readonly Color DarkTeal = new Color(0.05f, 0.4f, 0.4f, 0.95f);
+        private static readonly Color WindowBackground = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+        private static readonly Color InputBackground = new Color(1, 1, 1, 0.15f);
+        private static readonly Color ContentBackground = new Color(1, 1, 1, 0.1f);
+
+        private const int TitleBarHeight = 30;
+        private const int InputHeight = 25;
+        private const int Padding = 10;
+        private const int MaxChatHistory = 50;
 
         public ChatFeature() : base("Chat", Config.CHAT_KEYBIND.Value) { }
+
 
         public void DrawGUI()
         {
             if (!IsEnabled) return;
 
-            Event current = Event.current;
-            if (current != null)
+            if (Event.current?.type == EventType.MouseDown)
             {
-                Vector2 mousePos = current.mousePosition;
-                Rect titleBarRect = new Rect(windowRect.x, windowRect.y, windowRect.width, 30);
-
-                // Focus handling
-                if (current.type == EventType.MouseDown)
-                {
-                    isChatFocused = windowRect.Contains(mousePos);
-                }
+                isChatFocused = windowRect.Contains(Event.current.mousePosition);
             }
 
-            // Color
-            Color mikuTeal = new Color(0.07f, 0.82f, 0.82f, 0.95f);
-            Color darkTeal = new Color(0.05f, 0.4f, 0.4f, 0.95f);
+            DrawWindow();
+        }
+
+        private void HandleFocusEvents()
+        {
+            Event current = Event.current;
+            if (current?.type == EventType.MouseDown)
+            {
+                isChatFocused = windowRect.Contains(current.mousePosition);
+            }
+        }
+
+        private void DrawWindow()
+        {
             Color originalBgColor = GUI.backgroundColor;
 
-            // Main window with shadow effect
+            DrawShadow();
+            DrawMainWindow();
+            DrawTitleBar();
+            DrawChatContent();
+            DrawInputArea();
+
+            GUI.backgroundColor = originalBgColor;
+        }
+
+        private void DrawShadow()
+        {
             GUI.backgroundColor = Color.black;
-            GUI.Box(new Rect(windowRect.x + 2, windowRect.y + 2, windowRect.width, windowRect.height), "");
+            GUI.Box(new Rect(windowRect.x + 2, windowRect.y + 2, windowRect.width, windowRect.height), string.Empty);
+        }
 
-            // Main window
-            GUI.backgroundColor = new Color(0.1f, 0.1f, 0.1f, 0.95f);
-            GUI.Box(windowRect, "");
+        private void DrawMainWindow()
+        {
+            GUI.backgroundColor = WindowBackground;
+            GUI.Box(windowRect, string.Empty);
+        }
 
-            // Title bar
-            GUI.backgroundColor = mikuTeal;
-            GUI.Box(new Rect(windowRect.x, windowRect.y, windowRect.width, 30), "");
+        private void DrawTitleBar()
+        {
+            Rect titleBarRect = new Rect(windowRect.x, windowRect.y, windowRect.width, TitleBarHeight);
+            GUI.backgroundColor = MikuTeal;
+            GUI.Box(titleBarRect, string.Empty);
 
-            // Title (centered)
             GUI.Label(new Rect(windowRect.x + 60, windowRect.y + 5, windowRect.width - 120, 20), "✧ Mate Chat ♪ ✧");
 
-            // Clear button (moved to right side)
-            GUI.backgroundColor = darkTeal;
-            bool clearClicked = GUI.Button(new Rect(windowRect.x + windowRect.width - 55, windowRect.y + 5, 50, 20), "Clear");
-            if (clearClicked)
+            Rect clearButtonRect = new Rect(windowRect.x + windowRect.width - 55, windowRect.y + 5, 50, 20);
+            GUI.backgroundColor = clearButtonRect.Contains(Event.current.mousePosition)
+                ? new Color(DarkTeal.r * 1.2f, DarkTeal.g * 1.2f, DarkTeal.b * 1.2f, DarkTeal.a)
+                : DarkTeal;
+
+            if (GUI.Button(clearButtonRect, "Clear"))
             {
-                responseText = "";
-                inputText = "";
+                ClearChat();
+            }
+        }
+
+        private void DrawChatContent()
+        {
+            GUI.backgroundColor = ContentBackground;
+            Rect contentRect = new Rect(
+                windowRect.x + Padding,
+                windowRect.y + TitleBarHeight + Padding,
+                windowRect.width - (Padding * 2),
+                windowRect.height - TitleBarHeight - InputHeight - (Padding * 3)
+            );
+
+            GUI.Box(contentRect, string.Empty);
+
+            // Handle mouse scroll wheel
+            if (contentRect.Contains(Event.current.mousePosition))
+            {
+                float scroll = Input.mouseScrollDelta.y * 20f;
+                scrollPosition.y = Mathf.Clamp(scrollPosition.y - scroll, 0, Mathf.Max(0, responseText.Length * 2 - contentRect.height));
             }
 
-            // Chat history area
-            GUI.backgroundColor = new Color(1, 1, 1, 0.1f);
-            Rect contentRect = new Rect(windowRect.x + 10, windowRect.y + 40, windowRect.width - 20, windowRect.height - 80);
-            GUI.Box(contentRect, "");
+            // Create a clipped area for the text
+            GUI.BeginGroup(contentRect);
 
-            // Display chat history
-            GUI.Label(new Rect(contentRect.x + 5, contentRect.y + 5, contentRect.width - 10, contentRect.height - 10), responseText);
+            // Draw the text offset by the scroll position
+            GUI.Label(new Rect(5, -scrollPosition.y, contentRect.width - 10, Mathf.Max(contentRect.height, responseText.Length * 2)),
+                responseText);
 
-            // Input area
-            GUI.backgroundColor = new Color(1, 1, 1, 0.15f);
-            Rect inputRect = new Rect(windowRect.x + 10, windowRect.y + windowRect.height - 35, windowRect.width - 90, 25);
-            GUI.Box(inputRect, "");
+            GUI.EndGroup();
+        }
+
+
+        private void DrawInputArea()
+        {
+            GUI.backgroundColor = InputBackground;
+            Rect inputRect = new Rect(windowRect.x + Padding, windowRect.y + windowRect.height - InputHeight - Padding,
+                                    windowRect.width - 90, InputHeight);
+
+            GUI.Box(inputRect, string.Empty);
             GUI.Label(inputRect, inputText);
 
-            // Handle input
-            if (isChatFocused && current != null && current.type == EventType.KeyDown)
-            {
-                if (current.keyCode == KeyCode.Return)
-                {
-                    if (!string.IsNullOrEmpty(inputText))
-                    {
-                        SendMessage();
-                    }
-                    current.Use();
-                }
-                else if (current.keyCode == KeyCode.Backspace && inputText.Length > 0)
-                {
-                    inputText = inputText.Substring(0, inputText.Length - 1);
-                    current.Use();
-                }
-                else if (!char.IsControl(current.character))
-                {
-                    inputText += current.character;
-                    current.Use();
-                }
-            }
+            HandleInputEvents();
+            DrawSendButton(inputRect);
+        }
 
-            // Send button
-            GUI.backgroundColor = mikuTeal;
-            Rect sendButtonRect = new Rect(windowRect.x + windowRect.width - 70, windowRect.y + windowRect.height - 35, 60, 25);
-            bool sendClicked = GUI.Button(sendButtonRect, "♪ Send");
-            if (sendClicked && !string.IsNullOrEmpty(inputText))
+        private void HandleInputEvents()
+        {
+            if (!isChatFocused || Event.current?.type != EventType.KeyDown) return;
+
+            switch (Event.current.keyCode)
+            {
+                case KeyCode.Return when !string.IsNullOrEmpty(inputText):
+                    SendMessage();
+                    Event.current.Use();
+                    break;
+                case KeyCode.Backspace when inputText.Length > 0:
+                    inputText = inputText[..^1];
+                    Event.current.Use();
+                    break;
+                default:
+                    if (!char.IsControl(Event.current.character))
+                    {
+                        inputText += Event.current.character;
+                        Event.current.Use();
+                    }
+                    break;
+            }
+        }
+
+        private void DrawSendButton(Rect inputRect)
+        {
+            GUI.backgroundColor = MikuTeal;
+            Rect sendButtonRect = new Rect(inputRect.x + inputRect.width + 10, inputRect.y, 60, InputHeight);
+
+            if (GUI.Button(sendButtonRect, "♪ Send") && !string.IsNullOrEmpty(inputText))
             {
                 SendMessage();
             }
-
-            GUI.backgroundColor = originalBgColor;
         }
 
         private void SendMessage()
         {
             if (string.IsNullOrEmpty(inputText) || isWaitingForResponse) return;
 
-            // Melon<Core>.Logger.Msg("Message sent: " + inputText);
-
-            if (responseText.Length > 0)
-                responseText += "\n\n";
-
-            responseText += "You: " + inputText;
+            AppendToChatHistory($"You: {inputText}");
             string userMessage = inputText;
-            inputText = "";
+            inputText = string.Empty;
 
-            // Show typing indicator
-            responseText += "\nMate: typing...";
+            AppendToChatHistory("Mate: typing...");
             isWaitingForResponse = true;
 
-            // Start coroutine for API call
             MelonCoroutines.Start(GetAIResponse(userMessage));
         }
+
+        private void AppendToChatHistory(string message)
+        {
+            if (responseText.Length > 0)
+                responseText += "\n\n";
+            responseText += message;
+            scrollPosition.y = float.MaxValue;
+        }
+
+        private void ClearChat()
+        {
+            responseText = string.Empty;
+            inputText = string.Empty;
+            scrollPosition = Vector2.zero;
+        }
+
         private IEnumerator GetAIResponse(string userMessage)
         {
-            string jsonRequest = "{\"messages\":[" +
-            "{\"role\":\"system\",\"content\":\"" + JsonUtil.EscapeJsonString(Config.SYSTEM_PROMPT.Value) + "\"}," +
-            "{\"role\":\"user\",\"content\":\"" + JsonUtil.EscapeJsonString(userMessage) + "\"}]}";
+            string jsonRequest = $"{{\"messages\":[{{\"role\":\"system\",\"content\":\"{JsonUtil.EscapeJsonString(Config.SYSTEM_PROMPT.Value)}\"}},{{\"role\":\"user\",\"content\":\"{JsonUtil.EscapeJsonString(userMessage)}\"}}]}}";
 
-
-            var webRequest = new UnityWebRequest(Config.API_URL.Value, "POST");
-            byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonRequest);
-
-            webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
-            webRequest.downloadHandler = new DownloadHandlerBuffer();
-            webRequest.SetRequestHeader("Content-Type", "application/json");
-            webRequest.SetRequestHeader("Authorization", "Bearer " + Config.API_KEY.Value);
-
-            yield return webRequest.SendWebRequest();
-
-            // @TODO : redo error handling completely
-            if (webRequest.result == UnityWebRequest.Result.Success)
+            UnityWebRequest webRequest = new UnityWebRequest(Config.API_URL.Value, "POST");
+            try
             {
-                try
-                {
-                    string response = webRequest.downloadHandler.text;
+                byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonRequest);
+                webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
+                webRequest.downloadHandler = new DownloadHandlerBuffer();
+                webRequest.SetRequestHeader("Content-Type", "application/json");
+                webRequest.SetRequestHeader("Authorization", $"Bearer {Config.API_KEY.Value}");
 
-                    // @TODO : replace with real JSON handling??
-                    // Find the response text between "response":"" and "},"success"
-                    int startIndex = response.IndexOf("\"response\":\"") + 11;
-                    int endIndex = response.IndexOf("\"}", startIndex);
+                yield return webRequest.SendWebRequest();
 
-                    if (startIndex != -1 && endIndex != -1)
-                    {
-                        string aiResponse = response.Substring(startIndex, endIndex - startIndex);
-                        // Melon<Core>.Logger.Msg("Parsed AI response: " + aiResponse);
-                        responseText = responseText.Replace("Mate: typing...", "Mate: " + aiResponse);
-                    }
-                    else
-                    {
-                        Melon<Core>.Logger.Error("Could not find response in: " + response);
-                        responseText = responseText.Replace("Mate: typing...", "Mate: Sorry, I received an invalid response format.");
-                    }
-                }
-                catch (System.Exception ex)
-                {
-                    Melon<Core>.Logger.Error("Failed to parse API response: " + ex.Message);
-                    responseText = responseText.Replace("Mate: typing...", "Mate: Sorry, I encountered an error while processing your message.");
-                }
+                ProcessApiResponse(webRequest);
             }
-            else
+            finally
+            {
+                if (webRequest.uploadHandler != null)
+                    webRequest.uploadHandler.Dispose();
+                if (webRequest.downloadHandler != null)
+                    webRequest.downloadHandler.Dispose();
+                webRequest.Dispose();
+
+                isWaitingForResponse = false;
+                LimitChatHistory();
+            }
+        }
+
+        private void ProcessApiResponse(UnityWebRequest webRequest)
+        {
+            if (webRequest.result != UnityWebRequest.Result.Success)
             {
                 Melon<Core>.Logger.Error($"API request failed: {webRequest.error}");
-                responseText = responseText.Replace("Mate: typing...", "Mate: Sorry, I couldn't connect to llm right now.");
+                UpdateTypingMessage("Sorry, I couldn't connect to llm right now.");
+                return;
             }
 
-            // Cleanup
-            webRequest.uploadHandler.Dispose();
-            webRequest.downloadHandler.Dispose();
-            webRequest.Dispose();
-
-            isWaitingForResponse = false;
-
-            // Limit chat history
-            const int maxLines = 10;
-            string[] lines = responseText.Split('\n');
-            if (lines.Length > maxLines)
+            try
             {
-                responseText = string.Join("\n", lines.Skip(lines.Length - maxLines));
+                string response = webRequest.downloadHandler.text;
+                int startIndex = response.IndexOf("\"response\":\"") + 11;
+                int endIndex = response.IndexOf("\"}", startIndex);
+
+                if (startIndex != -1 && endIndex != -1)
+                {
+                    string aiResponse = response[startIndex..endIndex];
+                    UpdateTypingMessage(aiResponse);
+                }
+                else
+                {
+                    Melon<Core>.Logger.Error($"Could not find response in: {response}");
+                    UpdateTypingMessage("Sorry, I received an invalid response format.");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                Melon<Core>.Logger.Error($"Failed to parse API response: {ex.Message}");
+                UpdateTypingMessage("Sorry, I encountered an error while processing your message.");
+            }
+        }
+
+        private void UpdateTypingMessage(string newMessage)
+        {
+            responseText = responseText.Replace("Mate: typing...", $"Mate: {newMessage}");
+        }
+
+        private void LimitChatHistory()
+        {
+            string[] lines = responseText.Split('\n');
+            if (lines.Length > MaxChatHistory)
+            {
+                responseText = string.Join("\n", lines.Skip(lines.Length - MaxChatHistory));
             }
         }
     }
