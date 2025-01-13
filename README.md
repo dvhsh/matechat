@@ -10,7 +10,7 @@ You can easily setup a CloudFlare AI Worker and obtain your `API_URL` and `API_K
 - Run Desktop Mate once and then exit
 - Put latest `matechat.dll` into your Mods folder
 - Run Desktop Mate and right click to open it's menu, select MateChat
-- Click the Open Config button, edit the configuration to include your credentials, save, then press Reload Config
+- Click the Open Config button, edit the configuration to include your credentials(`API_KEY`, `API_URL`), save, then press Reload Config
 - You are now ready to chat with your Desktop Mate!
 
 # Planned Features
