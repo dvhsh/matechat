@@ -5,6 +5,11 @@ This currently relies on having a cloudflare worker running meta/llama-3-8b-inst
 
 You can easily setup a CloudFlare AI Worker and obtain your `API_URL` and `API_KEY` by following this [short guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/).
 
+You can test your CloudFlare AI Worker by running this command in Command Prompt
+```
+curl -X POST https://api.cloudflare.com/client/v4/accounts/ACCOUNT_ID/ai/run/@cf/meta/llama-3-8b-instruct -H "Authorization: Bearer API_KEY" -d "{\"messages\":[{\"role\":\"system\",\"content\":\"You are a friendly assistant\"},{\"role\":\"user\",\"content\":\"hi \"}]}"
+```
+
 [Desktop Mate Modding discord server](https://discord.gg/Xu7pEU24kw)
 
 # Usage
