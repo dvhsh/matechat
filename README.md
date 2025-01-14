@@ -3,7 +3,7 @@
 
 This currently relies on having a cloudflare worker running meta/llama-3-8b-instruct. 
 
-You can easily setup a CloudFlare AI Worker and obtain your `API_URL` and `API_KEY` by following this [short guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/).
+You can easily setup a CloudFlare AI Worker and obtain your `API_URL` and `API_KEY`(token) by following this [short guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/).
 
 You can test your CloudFlare AI Worker by running this command in Command Prompt (replace `ACCOUNT_ID` and `API_KEY`)
 ```
