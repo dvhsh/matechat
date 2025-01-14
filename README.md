@@ -7,7 +7,7 @@ You can easily setup a CloudFlare AI Worker and obtain your `API_URL` and `API_K
 
 The mod will test your config on startup and every time the config is reloaded. This test will log results into the MelonLoader console and it will let you know if your worker is setup correctly, and if your config is malformed.
 
-[Desktop Mate Modding discord server](https://discord.gg/Xu7pEU24kw)
+[MateChat for Desktop Mate discord server](https://discord.gg/Xu7pEU24kw)
 
 # Usage
 - Install the latest [MelonLoader](https://github.com/LavaGang/MelonLoader/) to Desktop Mate
