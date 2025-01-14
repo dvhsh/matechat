@@ -1,4 +1,4 @@
-![MateChat Banner][matechat.png]
+<img src="matechat.png" alt="MateChat Banner" width="100%">
 
 # MateChat
 > A MelonLoader mod that lets you chat with your Desktop Mate using AI! ♪
