@@ -2,6 +2,7 @@ using System.Collections;
 using System.Text;
 
 using MelonLoader;
+using MelonLoader.Utils;
 
 using UnityEngine;
 using UnityEngine.Networking;
@@ -19,12 +20,9 @@ namespace matechat.feature
         private bool isChatFocused;
         private Vector2 scrollPosition;
 
-        private readonly Rect windowRect = new Rect(
-            20, 
-            20,                
-            400,             
-            500               
-        );
+        private GUIStyle textStyle;
+        
+        private Rect windowRect;
 
         private static readonly Color MikuTeal = new Color(0.07f, 0.82f, 0.82f, 0.95f);
         private static readonly Color DarkTeal = new Color(0.05f, 0.4f, 0.4f, 0.95f);
@@ -37,8 +35,25 @@ namespace matechat.feature
         private const int Padding = 10;
         private const int MaxChatHistory = 50;
 
-        public ChatFeature() : base("Chat", Config.CHAT_KEYBIND.Value) { }
+        public ChatFeature() : base("Chat", Config.CHAT_KEYBIND.Value)
+        {
+            textStyle = new GUIStyle();
+            textStyle.normal.textColor = Color.white;
+            textStyle.fontSize = Config.CHAT_WINDOW_FONT_SIZE.Value;
+            textStyle.wordWrap = true;
 
+            UpdateWindowRect();
+            UpdateSettings();
+        }
+        public void UpdateWindowRect()
+        {
+            windowRect = new Rect(
+                Config.CHAT_WINDOW_X.Value,
+                Config.CHAT_WINDOW_Y.Value,
+                Config.CHAT_WINDOW_WIDTH.Value,
+                Config.CHAT_WINDOW_HEIGHT.Value
+            );
+        }
 
         public void DrawGUI()
         {
@@ -117,32 +132,33 @@ namespace matechat.feature
 
             GUI.Box(contentRect, string.Empty);
 
-            // Handle mouse scroll wheel
             if (contentRect.Contains(Event.current.mousePosition))
             {
                 float scroll = Input.mouseScrollDelta.y * 20f;
                 scrollPosition.y = Mathf.Clamp(scrollPosition.y - scroll, 0, Mathf.Max(0, responseText.Length * 2 - contentRect.height));
             }
 
-            // Create a clipped area for the text
             GUI.BeginGroup(contentRect);
-
-            // Draw the text offset by the scroll position
-            GUI.Label(new Rect(5, -scrollPosition.y, contentRect.width - 10, Mathf.Max(contentRect.height, responseText.Length * 2)),
-                responseText);
-
+            GUI.Label(
+                new Rect(5, -scrollPosition.y, contentRect.width - 10, Mathf.Max(contentRect.height, responseText.Length * 2)),
+                responseText,
+                textStyle
+            );
             GUI.EndGroup();
         }
-
 
         private void DrawInputArea()
         {
             GUI.backgroundColor = InputBackground;
-            Rect inputRect = new Rect(windowRect.x + Padding, windowRect.y + windowRect.height - InputHeight - Padding,
-                                    windowRect.width - 90, InputHeight);
+            Rect inputRect = new Rect(
+                windowRect.x + Padding,
+                windowRect.y + windowRect.height - InputHeight - Padding,
+                windowRect.width - 90,
+                InputHeight
+            );
 
             GUI.Box(inputRect, string.Empty);
-            GUI.Label(inputRect, inputText);
+            GUI.Label(inputRect, inputText, textStyle);
 
             HandleInputEvents();
             DrawSendButton(inputRect);
@@ -287,6 +303,12 @@ namespace matechat.feature
             {
                 responseText = string.Join("\n", lines.Skip(lines.Length - MaxChatHistory));
             }
+        }
+
+        public void UpdateSettings()
+        {
+            textStyle.fontSize = Config.CHAT_WINDOW_FONT_SIZE.Value;
+            UpdateWindowRect();
         }
     }
 }
