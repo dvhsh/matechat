@@ -3,7 +3,7 @@
 
 This currently relies on having a cloudflare worker running meta/llama-3-8b-instruct. 
 
-You can easily setup a CloudFlare AI Worker and obtain your `API_URL` and `API_KEY`(token) by following this [short guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/).
+You can easily setup a CloudFlare AI Worker and obtain your `API_URL` and `API_KEY`(API token) by following this [short guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/).
 
 The mod will test your config on startup and every time the config is reloaded. This test will log results into the MelonLoader console and it will let you know if your worker is setup correctly, and if your config is malformed.
 
