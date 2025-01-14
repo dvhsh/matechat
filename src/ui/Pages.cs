@@ -148,7 +148,7 @@ namespace matechat.ui.Pages
             var button = CreateSettingsButton(template, "ReloadButton", EmbeddedAssets.ReloadButton, new Vector2(0, -60));
             button.onClick.AddListener((UnityEngine.Events.UnityAction)delegate
             {
-                Config.category.LoadFromFile();
+                Config.ReloadConfig();
             });
         }
 
