@@ -39,7 +39,7 @@ namespace matechat
             CHAT_WINDOW_X = category.CreateEntry("CHAT_WINDOW_X", 20);
             CHAT_WINDOW_Y = category.CreateEntry("CHAT_WINDOW_Y", 20);
             CHAT_WINDOW_FONT_SIZE = category.CreateEntry("CHAT_WINDOW_FONT_SIZE", 16);
-            API_KEY = category.CreateEntry("AI_NAME", "Mate");
+            AI_NAME = category.CreateEntry("AI_NAME", "Mate");
 
             category.SetFilePath("UserData/MateChat.cfg");
         }
