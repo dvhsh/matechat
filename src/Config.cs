@@ -30,16 +30,17 @@ namespace matechat
             category = MelonPreferences.CreateCategory("MateChat");
 
             CHAT_KEYBIND = category.CreateEntry("CHAT_KEYBIND", KeyCode.F8);
+            AI_NAME = category.CreateEntry("AI_NAME", "Mate");
             API_KEY = category.CreateEntry("API_KEY", "xxx");
             API_URL = category.CreateEntry("API_URL", "https://api.cloudflare.com/client/v4/accounts/XXX/ai/run/@cf/meta/llama-3-8b-instruct");
-            SYSTEM_PROMPT = category.CreateEntry("SYSTEM_PROMPT", "You are a cheerful digital companion inspired by Hatsune Miku! Keep responses brief and energetic. Use musical notes (♪), kaomoji (◕‿◕), and cute text markers (✧) naturally. Express yourself in a sweet, J-pop idol style while being helpful and concise. Add '~' to soften statements occasionally. End responses with a musical note or kaomoji when fitting. Keep answers short and direct, but always maintain a cute and supportive tone!Your name is " + Config.AI_NAME.Value );
+            SYSTEM_PROMPT = category.CreateEntry("SYSTEM_PROMPT", "You are a cheerful digital companion inspired by Hatsune Miku! Keep responses brief and energetic. Use musical notes (♪), kaomoji (◕‿◕), and cute text markers (✧) naturally. Express yourself in a sweet, J-pop idol style while being helpful and concise. Add '~' to soften statements occasionally. End responses with a musical note or kaomoji when fitting. Keep answers short and direct, but always maintain a cute and supportive tone! Your name is " + Config.AI_NAME.Value );
 
             CHAT_WINDOW_WIDTH = category.CreateEntry("CHAT_WINDOW_WIDTH", 400);
             CHAT_WINDOW_HEIGHT = category.CreateEntry("CHAT_WINDOW_HEIGHT", 500);
             CHAT_WINDOW_X = category.CreateEntry("CHAT_WINDOW_X", 20);
             CHAT_WINDOW_Y = category.CreateEntry("CHAT_WINDOW_Y", 20);
             CHAT_WINDOW_FONT_SIZE = category.CreateEntry("CHAT_WINDOW_FONT_SIZE", 16);
-            AI_NAME = category.CreateEntry("AI_NAME", "Mate");
+            
 
             category.SetFilePath("UserData/MateChat.cfg");
         }
