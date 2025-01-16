@@ -411,7 +411,16 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Compile Include="AssemblyInfo.cs" />
+		<Compile Include="Config.cs" />
+		<Compile Include="Constants.cs" />
 		<Compile Include="Core.cs" />
+		<Compile Include="feature\ChatFeature.cs" />
+		<Compile Include="sdk\Feature.cs" />
+		<Compile Include="ui\EmbeddedAssets.cs" />
+		<Compile Include="ui\MenuManager.cs" />
+		<Compile Include="ui\Pages.cs" />
+		<Compile Include="util\JsonUtil.cs" />
 	</ItemGroup>
 	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
