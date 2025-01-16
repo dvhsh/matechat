@@ -23,6 +23,7 @@ namespace matechat
         public static MelonPreferences_Entry<int> CHAT_WINDOW_X;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_Y;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_FONT_SIZE;
+        public static MelonPreferences_Entry<string> AI_NAME;
 
         public static void Initialize()
         {
@@ -38,6 +39,7 @@ namespace matechat
             CHAT_WINDOW_X = category.CreateEntry("CHAT_WINDOW_X", 20);
             CHAT_WINDOW_Y = category.CreateEntry("CHAT_WINDOW_Y", 20);
             CHAT_WINDOW_FONT_SIZE = category.CreateEntry("CHAT_WINDOW_FONT_SIZE", 16);
+            API_KEY = category.CreateEntry("AI_NAME", "Mate");
 
             category.SetFilePath("UserData/MateChat.cfg");
         }
