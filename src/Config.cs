@@ -43,6 +43,7 @@ namespace matechat
             
 
             category.SetFilePath("UserData/MateChat.cfg");
+            category.SaveToFile();
         }
 
         public static bool TestConfig()
