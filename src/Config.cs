@@ -40,6 +40,7 @@ namespace matechat
             CHAT_WINDOW_FONT_SIZE = category.CreateEntry("CHAT_WINDOW_FONT_SIZE", 16);
 
             category.SetFilePath("UserData/MateChat.cfg");
+            category.SaveToFile();
         }
 
         public static bool TestConfig()
