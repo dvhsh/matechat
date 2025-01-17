@@ -207,7 +207,7 @@ namespace matechat.feature
             string userMessage = inputText;
             inputText = string.Empty;
 
-            AppendToChatHistory("Mate: typing...");
+            AppendToChatHistory(Config.AI_NAME.Value + ": typing...");
             isWaitingForResponse = true;
 
             MelonCoroutines.Start(GetAIResponse(userMessage));
@@ -293,7 +293,7 @@ namespace matechat.feature
 
         private void UpdateTypingMessage(string newMessage)
         {
-            responseText = responseText.Replace("Mate: typing...", $"Mate: {newMessage}");
+            responseText = responseText.Replace(Config.AI_NAME.Value + ": typing...", Config.AI_NAME.Value + $": {newMessage}");
         }
 
         private void LimitChatHistory()
