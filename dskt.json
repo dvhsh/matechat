@@ -1,3 +1,7 @@
 {
+  "description": "test",
+  "author":"dvhsh",
+  "category" : ["Overhaul"],
+  "type": "MelonLoader",
   "version" : "1.0.4"
 }
