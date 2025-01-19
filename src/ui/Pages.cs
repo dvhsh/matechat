@@ -16,7 +16,9 @@ namespace matechat.ui.Pages
         private readonly GameObject menuManager;
         private readonly GameObject uniWindowController;
 
-        public SettingsPage(Transform menuParent, GameObject rootPage, GameObject menuManager, GameObject uniWindowController)
+        public SettingsPage(Transform menuParent, GameObject rootPage,
+                            GameObject menuManager,
+                            GameObject uniWindowController)
         {
             this.rootPageObj = rootPage;
             this.menuManager = menuManager;
@@ -28,7 +30,8 @@ namespace matechat.ui.Pages
             CreateVersionInfo();
         }
 
-        private GameObject CreatePageObject(Transform menuParent, GameObject rootPage)
+        private GameObject CreatePageObject(Transform menuParent,
+                                            GameObject rootPage)
         {
             var page = new GameObject("MateChatSettingsPage");
             page.transform.SetParent(menuParent, false);
@@ -48,42 +51,50 @@ namespace matechat.ui.Pages
             return page;
         }
 
-        private void SetupNavigationButtons(Transform sourcePage, Transform targetParent)
+        private void SetupNavigationButtons(Transform sourcePage,
+                                            Transform targetParent)
         {
-            SetupButton(sourcePage, "BackButton", targetParent, (UnityEngine.Events.UnityAction)delegate
-            {
-                if (menuManager != null)
-                {
-                    Component[] components = menuManager.GetComponents<Component>();
-                    if (components.Length > 1)
-                    {
-                        components[1].SendMessage("Back", SendMessageOptions.DontRequireReceiver);
-                    }
-                }
-                Hide();
-                rootPageObj.SetActive(true);
-            });
+            SetupButton(sourcePage, "BackButton", targetParent,
+                        (UnityEngine.Events.UnityAction)delegate {
+                            if (menuManager != null)
+                            {
+                                Component[] components =
+                              menuManager.GetComponents<Component>();
+                                if (components.Length > 1)
+                                {
+                                    components[1].SendMessage(
+                                  "Back", SendMessageOptions.DontRequireReceiver);
+                                }
+                            }
+                            Hide();
+                            rootPageObj.SetActive(true);
+                        });
 
-            SetupButton(sourcePage, "CloseButton", targetParent, (UnityEngine.Events.UnityAction)delegate
-            {
-                if (uniWindowController != null)
-                {
-                    Component[] components = uniWindowController.GetComponents<Component>();
-                    if (components.Length > 1)
-                    {
-                        components[1].SendMessage("Close", SendMessageOptions.DontRequireReceiver);
-                    }
-                }
-                MelonCoroutines.Start(DelayedClose());
-            });
+            SetupButton(sourcePage, "CloseButton", targetParent,
+                        (UnityEngine.Events.UnityAction)delegate {
+                            if (uniWindowController != null)
+                            {
+                                Component[] components =
+                              uniWindowController.GetComponents<Component>();
+                                if (components.Length > 1)
+                                {
+                                    components[1].SendMessage(
+                                  "Close", SendMessageOptions.DontRequireReceiver);
+                                }
+                            }
+                            MelonCoroutines.Start(DelayedClose());
+                        });
         }
 
-        private void SetupButton(Transform sourcePage, string buttonName, Transform targetParent, UnityEngine.Events.UnityAction action)
+        private void SetupButton(Transform sourcePage, string buttonName,
+                                 Transform targetParent,
+                                 UnityEngine.Events.UnityAction action)
         {
             Transform originalButton = sourcePage.Find(buttonName);
             if (originalButton != null)
             {
-                GameObject buttonCopy = GameObject.Instantiate(originalButton.gameObject, targetParent);
+                GameObject buttonCopy =
+                    GameObject.Instantiate(originalButton.gameObject, targetParent);
                 buttonCopy.name = buttonName;
                 Button button = buttonCopy.GetComponent<Button>();
                 if (button != null)
@@ -110,8 +121,10 @@ namespace matechat.ui.Pages
 
         private void InitializeButtons()
         {
-            Transform contentTransform = GameObject.Find(Constants.UI.CONTENT_PATH)?.transform;
-            Button templateButton = contentTransform?.GetComponentInChildren<Button>();
+            Transform contentTransform =
+                GameObject.Find(Constants.UI.CONTENT_PATH)?.transform;
+            Button templateButton =
+                contentTransform?.GetComponentInChildren<Button>();
 
             if (templateButton != null)
             {
@@ -122,10 +135,12 @@ namespace matechat.ui.Pages
 
         private void CreateConfigButton(Button template)
         {
-            var button = CreateSettingsButton(template, "ConfigButton", EmbeddedAssets.EditButton, new Vector2(0, 0));
-            button.onClick.AddListener((UnityEngine.Events.UnityAction)delegate
-            {
-                string configPath = Path.Combine(MelonEnvironment.UserDataDirectory, "MateChat.cfg");
+            var button =
+                CreateSettingsButton(template, "ConfigButton",
+                                     EmbeddedAssets.EditButton, new Vector2(0, 0));
+            button.onClick.AddListener((UnityEngine.Events.UnityAction)delegate {
+                string configPath =
+                    Path.Combine(MelonEnvironment.UserDataDirectory, "MateChat.cfg");
                 try
                 {
                     var startInfo = new System.Diagnostics.ProcessStartInfo
@@ -145,16 +160,18 @@ namespace matechat.ui.Pages
 
         private void CreateReloadButton(Button template)
         {
-            var button = CreateSettingsButton(template, "ReloadButton", EmbeddedAssets.ReloadButton, new Vector2(0, -60));
-            button.onClick.AddListener((UnityEngine.Events.UnityAction)delegate
-            {
-                Config.ReloadConfig();
-            });
+            var button = CreateSettingsButton(template, "ReloadButton",
+                                              EmbeddedAssets.ReloadButton,
+                                              new Vector2(0, -60));
+            button.onClick.AddListener(
+                (UnityEngine.Events.UnityAction)delegate { Config.ReloadConfig(); });
         }
 
-        private Button CreateSettingsButton(Button template, string name, byte[] spriteData, Vector2 position)
+        private Button CreateSettingsButton(Button template, string name,
+                                            byte[] spriteData, Vector2 position)
         {
-            GameObject buttonObj = GameObject.Instantiate(template.gameObject, contentObject.transform);
+            GameObject buttonObj =
+                GameObject.Instantiate(template.gameObject, contentObject.transform);
             buttonObj.name = name;
 
             Image buttonImage = buttonObj.GetComponent<Image>();
@@ -183,7 +200,8 @@ namespace matechat.ui.Pages
 
         private void CreateVersionInfo()
         {
-            CreateInfoText(contentObject.transform, $"MateChat v{Constants.VERSION}", 2);
+            CreateInfoText(contentObject.transform, $"MateChat v{Constants.VERSION}",
+                           2);
         }
 
         private void CreateInfoText(Transform parent, string text, int index)
@@ -206,12 +224,14 @@ namespace matechat.ui.Pages
             rectTransform.anchoredPosition = new Vector2(0, 20);
         }
 
-        private void CopyComponent(Transform sourceParent, string childName, Transform targetParent)
+        private void CopyComponent(Transform sourceParent, string childName,
+                                   Transform targetParent)
         {
             Transform originalTransform = sourceParent.Find(childName);
             if (originalTransform != null)
             {
-                GameObject copiedObject = GameObject.Instantiate(originalTransform.gameObject, targetParent);
+                GameObject copiedObject =
+                    GameObject.Instantiate(originalTransform.gameObject, targetParent);
                 copiedObject.name = childName;
             }
         }
