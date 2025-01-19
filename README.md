@@ -37,16 +37,19 @@ Need help setting up your Cloudflare AI Worker? Follow this [quick guide](https:
 ## Example Config
 ```
 [MateChat]
+[MateChat]
 CHAT_KEYBIND = "F8"
+ENGINE_TYPE = "Cloudflare"
+ACCOUNT_ID = ""
+API_KEY = ""
+MODEL_NAME = "llama-3-8b-instruct"
+SYSTEM_PROMPT = "You are a cheerful digital companion inspired by Hatsune Miku!"
 AI_NAME = "Desktop Mate"
-API_KEY = "API_KEY"
-API_URL = "https://api.cloudflare.com/client/v4/accounts/ACCOUNT_ID/ai/run/@cf/meta/llama-3-8b-instruct"
-SYSTEM_PROMPT = "You are a cheerful digital companion inspired by Hatsune Miku! Keep responses brief and energetic. Use musical notes (♪), kaomoji (◕‿◕), and cute text markers (✧) naturally. Express yourself in a sweet, J-pop idol style while being helpful and concise. Add '~' to soften statements occasionally. End responses with a musical note or kaomoji when fitting. Keep answers short and direct, but always maintain a cute and supportive tone!"
 CHAT_WINDOW_WIDTH = 400
 CHAT_WINDOW_HEIGHT = 500
 CHAT_WINDOW_X = 20
 CHAT_WINDOW_Y = 20
-CHAT_WINDOW_FONT_SIZE = 24
+CHAT_WINDOW_FONT_SIZE = 16
 ```
 
 ## 💭 Coming Soon

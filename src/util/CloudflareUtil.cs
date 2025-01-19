@@ -2,132 +2,151 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Text;
 using MelonLoader;
+using matechat.util.matechat.util;
+using UnityEngine;
 
 namespace matechat.util
 {
-    public static class CloudflareUtil
+    public class CloudflareUtil : IAIEngine
     {
-        public static IEnumerator TestCloudflareWorker()
+        public IEnumerator SendRequest(string userMessage, string systemPrompt, System.Action<string, string> callback)
         {
-            if (!Config.TestConfig()) yield break;
-
-            string testMessage = CreateRequestJson("Test", "test");
-            yield return SendRequest(testMessage, (success, error) =>
+            if (!Config.TestConfig())
             {
-                if (success)
-                {
-                    MelonLogger.Msg("Cloudflare Worker test successful! Your config is ready to use!");
-                }
-                else
-                {
-                    MelonLogger.Error($"Cloudflare Worker test failed: {error}");
-                }
-            });
-        }
-
-        public static IEnumerator SendCloudflareRequest(string userMessage, string systemPrompt = null)
-        {
-            if (!Config.TestConfig()) yield break;
+                callback(null, "Config validation failed.");
+                yield break;
+            }
 
             systemPrompt ??= Config.SYSTEM_PROMPT.Value;
             string requestJson = CreateRequestJson(systemPrompt, userMessage);
 
-            UnityWebRequest webRequest = new UnityWebRequest(Config.API_URL.Value, "POST");
-            try
+            UnityWebRequest webRequest = new UnityWebRequest(Config.GetAPIUrl(), "POST");
+            byte[] jsonToSend = Encoding.UTF8.GetBytes(requestJson);
+
+            webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
+            webRequest.downloadHandler = new DownloadHandlerBuffer();
+            webRequest.SetRequestHeader("Content-Type", "application/json");
+            webRequest.SetRequestHeader("Authorization", $"Bearer {Config.API_KEY.Value}");
+
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.Success)
             {
-                byte[] jsonToSend = Encoding.UTF8.GetBytes(requestJson);
-                webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
-                webRequest.downloadHandler = new DownloadHandlerBuffer();
-                webRequest.SetRequestHeader("Content-Type", "application/json");
-                webRequest.SetRequestHeader("Authorization", $"Bearer {Config.API_KEY.Value}");
-
-                yield return webRequest.SendWebRequest();
-
-                if (webRequest.result == UnityWebRequest.Result.Success)
-                {
-                    string response = webRequest.downloadHandler.text;
-                    int startIndex = response.IndexOf("\"response\":\"") + 11;
-                    int endIndex = response.IndexOf("\"}", startIndex);
-
-                    if (startIndex != -1 && endIndex != -1)
-                    {
-                        string aiResponse = response[startIndex..endIndex];
-                        Core.GetChatFeature()?.UpdateTypingMessage(aiResponse);
-                    }
-                    else
-                    {
-                        MelonLogger.Error($"Could not find response in: {response}");
-                        Core.GetChatFeature()?.UpdateTypingMessage("Sorry, I received an invalid response format.");
-                    }
-                }
-                else
-                {
-                    MelonLogger.Error($"API request failed: {webRequest.error}");
-                    Core.GetChatFeature()?.UpdateTypingMessage("Sorry, I couldn't connect to llm right now.");
-                }
+                string rawResponse = webRequest.downloadHandler.text;
+                string parsedResponse = ParseCloudflareResponse(rawResponse);
+                callback(parsedResponse, null);
             }
-            finally
+            else
             {
-                if (webRequest.uploadHandler != null)
-                    webRequest.uploadHandler.Dispose();
-                if (webRequest.downloadHandler != null)
-                    webRequest.downloadHandler.Dispose();
-                webRequest.Dispose();
+                string errorMessage = webRequest.error;
+
+                switch (webRequest.responseCode)
+                {
+                    case 401:
+                    case 403:
+                        errorMessage = "Authentication failed - please check your API key!";
+                        break;
+                    case 404:
+                        errorMessage = "API URL not found - please check your account ID and endpoint!";
+                        break;
+                }
+
+                callback(null, errorMessage);
             }
         }
 
-        private static string CreateRequestJson(string systemPrompt, string userMessage)
-        {
-            return $"{{\"messages\":[{{\"role\":\"system\",\"content\":\"{JsonUtil.EscapeJsonString(systemPrompt)}\"}},{{\"role\":\"user\",\"content\":\"{JsonUtil.EscapeJsonString(userMessage)}\"}}]}}";
-        }
 
-        private static string CreateRequestJson(string systemPrompt, string resetMessage, string userMessage)
+        public IEnumerator TestEngine(System.Action<bool, string> callback)
         {
-            return $"{{\"messages\":[{{\"role\":\"system\",\"content\":\"{JsonUtil.EscapeJsonString(systemPrompt)}\"}},{{\"role\":\"user\",\"content\":\"{JsonUtil.EscapeJsonString(resetMessage)}\"}},{{\"role\":\"assistant\",\"content\":\"Understood, I will use the new system prompt.\"}},{{\"role\":\"user\",\"content\":\"{JsonUtil.EscapeJsonString(userMessage)}\"}}]}}";
-        }
-
-        private static IEnumerator SendRequest(string jsonRequest, System.Action<bool, string> callback)
-        {
-            UnityWebRequest webRequest = new UnityWebRequest(Config.API_URL.Value, "POST");
-
-            try
+            if (!Config.TestConfig())
             {
-                byte[] jsonToSend = Encoding.UTF8.GetBytes(jsonRequest);
-                webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
-                webRequest.downloadHandler = new DownloadHandlerBuffer();
-                webRequest.SetRequestHeader("Content-Type", "application/json");
-                webRequest.SetRequestHeader("Authorization", $"Bearer {Config.API_KEY.Value}");
+                callback(false, "Config validation failed.");
+                yield break;
+            }
 
-                yield return webRequest.SendWebRequest();
+            string testMessage = CreateRequestJson("This is a system test prompt.", "This is a user test message.");
 
-                if (webRequest.result == UnityWebRequest.Result.Success)
+
+            yield return SendRequest("Test", "test", (response, error) =>
+            {
+                if (!string.IsNullOrEmpty(response))
                 {
+                    MelonLogger.Msg("Cloudflare test successful! Your config is ready to use.");
                     callback(true, null);
                 }
                 else
                 {
-                    string errorMessage = webRequest.error;
-                    switch (webRequest.responseCode)
-                    {
-                        case 401:
-                        case 403:
-                            errorMessage = "Authentication failed - please check your API key!";
-                            break;
-                        case 404:
-                            errorMessage = "API URL not found - please check your account ID and endpoint!";
-                            break;
-                    }
-                    callback(false, errorMessage);
+                    MelonLogger.Error($"Cloudflare test failed: {error}");
+                    callback(false, error);
                 }
-            }
-            finally
+            });
+        }
+
+
+        private static string CreateRequestJson(string systemPrompt, string userMessage)
+        {
+            return $"{{\"prompt\":\"{JsonUtil.EscapeJsonString(systemPrompt)}\\n{JsonUtil.EscapeJsonString(userMessage)}\"}}";
+        }
+
+        private string ParseCloudflareResponse(string jsonResponse)
+        {
+            try
             {
-                if (webRequest.uploadHandler != null)
-                    webRequest.uploadHandler.Dispose();
-                if (webRequest.downloadHandler != null)
-                    webRequest.downloadHandler.Dispose();
-                webRequest.Dispose();
+                // Match "result.response"
+                var match = System.Text.RegularExpressions.Regex.Match(
+                    jsonResponse,
+                    "\"response\"\\s*:\\s*\"(.*?)\"",
+                    System.Text.RegularExpressions.RegexOptions.Singleline
+                );
+
+                if (!match.Success)
+                {
+                    return "Error: Unable to find 'response' in the Cloudflare response.";
+                }
+
+                string response = match.Groups[1].Value;
+
+                return response.Replace("\\n", "\n").Replace("\\\"", "\"");
+            }
+            catch (System.Exception)
+            {
+                return "Error: Unable to parse Cloudflare response.";
             }
         }
+
+
+
+
+        private string HandleError(UnityWebRequest webRequest)
+        {
+            string errorMessage = webRequest.error;
+
+            switch (webRequest.responseCode)
+            {
+                case 401:
+                case 403:
+                    errorMessage = "Authentication failed - please check your API key!";
+                    break;
+                case 404:
+                    errorMessage = "API URL not found - please check your account ID and endpoint!";
+                    break;
+            }
+
+            MelonLogger.Error($"Request failed: {errorMessage}");
+            return errorMessage;
+        }
+    }
+
+    [System.Serializable]
+    public class CloudflareResponse
+    {
+        public Result result;
+        public bool success;
+    }
+
+    [System.Serializable]
+    public class Result
+    {
+        public string response;
     }
 }
