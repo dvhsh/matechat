@@ -21,6 +21,8 @@ namespace matechat
         public static MelonPreferences_Entry<int> CHAT_WINDOW_X;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_Y;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_FONT_SIZE;
+        public static string lastUsedEngineType;
+
 
         public static string lastUsedSystemPrompt;
 
@@ -137,27 +139,37 @@ namespace matechat
             }
         }
 
+
         public static void ReloadConfig()
         {
             category.LoadFromFile();
+
             if (TestConfig())
             {
-                if (lastUsedSystemPrompt != SYSTEM_PROMPT.Value)
+                if (lastUsedSystemPrompt != SYSTEM_PROMPT.Value || lastUsedEngineType != ENGINE_TYPE.Value)
                 {
-                    MelonLogger.Msg("System prompt changed, sending reset request...");
-                    MelonCoroutines.Start(Core.GetAIEngine().SendRequest("Acknowledge the system prompt change.", SYSTEM_PROMPT.Value, (response, error) =>
-                    {
-                        if (!string.IsNullOrEmpty(response))
-                        {
-                            MelonLogger.Msg("System prompt reset acknowledged by the AI engine.");
-                        }
-                        else
-                        {
-                            MelonLogger.Error($"Failed to reset system prompt: {error}");
-                        }
-                    }));
+                    MelonLogger.Msg("Engine or system prompt changed. Reloading engine...");
                     lastUsedSystemPrompt = SYSTEM_PROMPT.Value;
+                    lastUsedEngineType = ENGINE_TYPE.Value;
+
+                    // Reload the AI Engine
+                    Core.ReloadAIEngine();
+
+                    // Notify the AI about the change (optional)
+                    MelonCoroutines.Start(Core.GetAIEngine().SendRequest(
+                        "Acknowledge the engine/system prompt change.", SYSTEM_PROMPT.Value, (response, error) =>
+                        {
+                            if (!string.IsNullOrEmpty(response))
+                            {
+                                MelonLogger.Msg("Engine/system prompt reset acknowledged.");
+                            }
+                            else
+                            {
+                                MelonLogger.Error($"Failed to reset engine/system prompt: {error}");
+                            }
+                        }));
                 }
+
 
                 Core.GetChatFeature()?.UpdateSettings();
                 MelonLogger.Msg("Config reloaded successfully!");

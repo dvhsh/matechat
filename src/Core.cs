@@ -52,29 +52,51 @@ namespace matechat
             }
         }
 
-        private void InitializeAIEngine()
+        private static void InitializeAIEngine()
         {
-            switch (Config.ENGINE_TYPE.Value) // Add ENGINE_TYPE to Config
+            try
             {
-                //Switch Case Based On engine
-                case "Cloudflare":
-                    aiEngine = new CloudflareUtil(); // Or CloudflareEngine
-                    LoggerInstance.Msg("Using Cloudflare engine.");
-                    break;
-                case "OpenRouter":
-                    aiEngine = new OpenRouterEngine(); 
-                    LoggerInstance.Msg("Using OpenRouter engine.");
-                    break;
-                case "OpenAI":
-                    aiEngine = new OpenAIUtil();
-                    LoggerInstance.Msg("Using OpenAI engine.");
-                    break;
-                default:
-                    LoggerInstance.Error($"Unsupported AI engine type: {Config.ENGINE_TYPE.Value}");
-                    throw new System.Exception("Invalid AI engine configuration.");
+                switch (Config.ENGINE_TYPE.Value)
+                {
+                    case "Cloudflare":
+                        aiEngine = new CloudflareUtil();
+                        MelonLogger.Msg("Using Cloudflare engine.");
+                        break;
+
+                    case "OpenRouter":
+                        aiEngine = new OpenRouterEngine();
+                        MelonLogger.Msg("Using OpenRouter engine.");
+                        break;
+
+                    case "OpenAI":
+                        aiEngine = new OpenAIUtil();
+                        MelonLogger.Msg("Using OpenAI engine.");
+                        break;
+
+                    default:
+                        MelonLogger.Error($"Unsupported AI engine type: {Config.ENGINE_TYPE.Value}");
+                        throw new System.Exception("Invalid AI engine configuration.");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to initialize AI engine: {ex.Message}");
+                throw;
             }
         }
 
+        public static void ReloadAIEngine()
+        {
+            try
+            {
+                InitializeAIEngine(); // Call the private method internally
+                MelonLogger.Msg("AI engine reloaded successfully.");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to reload AI engine: {ex.Message}");
+            }
+        }
         private IEnumerator DelayedMenuInit()
         {
             yield return new WaitForSeconds(1f);
