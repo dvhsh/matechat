@@ -1,3 +1,4 @@
 .vs
 src/obj
 src/bin
+/src/matechat.csproj

@@ -2,11 +2,14 @@ using MelonLoader;
 using UnityEngine;
 
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 using matechat.sdk.Feature;
-
 using matechat.feature;
 using matechat.ui;
+using matechat.util;
+using matechat.util.matechat.util;
 
 namespace matechat
 {
@@ -16,21 +19,31 @@ namespace matechat
         private MenuManager menuManager;
         private bool isInitialized;
 
+        // Field to store the selected AI engine
+        private static IAIEngine aiEngine;
+
         public override void OnApplicationStart()
         {
             try
             {
+                // Initialize the configuration
                 Config.Initialize();
+
+                // Initialize the AI engine based on the config
+                InitializeAIEngine();
+
+                // Initialize features
                 features = new List<Feature>();
                 features.Add(new ChatFeature());
 
                 menuManager = new MenuManager();
                 isInitialized = true;
 
+                // Reload configuration
                 Config.ReloadConfig();
                 LoggerInstance.Msg("Initialized.");
 
-                // wait a second before starting mod (@FIX)
+                // Wait a second before starting mod (@FIX)
                 MelonCoroutines.Start(DelayedMenuInit());
             }
             catch (System.Exception ex)
@@ -39,16 +52,70 @@ namespace matechat
             }
         }
 
+        private static void InitializeAIEngine()
+        {
+            try
+            {
+                switch (Config.ENGINE_TYPE.Value)
+                {
+                    case "Cloudflare":
+                        aiEngine = new CloudflareUtil();
+                        MelonLogger.Msg("Using Cloudflare engine.");
+                        break;
+
+                    case "OpenRouter":
+                        aiEngine = new OpenRouterEngine();
+                        MelonLogger.Msg("Using OpenRouter engine.");
+                        break;
+
+                    case "OpenAI":
+                        aiEngine = new OpenAIUtil();
+                        MelonLogger.Msg("Using OpenAI engine.");
+                        break;
+
+                    default:
+                        MelonLogger.Error($"Unsupported AI engine type: {Config.ENGINE_TYPE.Value}");
+                        throw new System.Exception("Invalid AI engine configuration.");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to initialize AI engine: {ex.Message}");
+                throw;
+            }
+        }
+
+        public static void ReloadAIEngine()
+        {
+            try
+            {
+                InitializeAIEngine(); // Call the private method internally
+                MelonLogger.Msg("AI engine reloaded successfully.");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to reload AI engine: {ex.Message}");
+            }
+        }
         private IEnumerator DelayedMenuInit()
         {
             yield return new WaitForSeconds(1f);
             MelonCoroutines.Start(menuManager.WaitForMenu());
         }
 
-        // @TODO exchange this for a func to get all features then sort/filter
         public static ChatFeature GetChatFeature()
         {
             return features?.FirstOrDefault(f => f is ChatFeature) as ChatFeature;
+        }
+
+        // Method to retrieve the selected AI engine
+        public static IAIEngine GetAIEngine()
+        {
+            if (aiEngine == null)
+            {
+                throw new System.Exception("AI engine is not initialized.");
+            }
+            return aiEngine;
         }
 
         public override void OnLateUpdate()

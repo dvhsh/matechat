@@ -1,11 +1,9 @@
 using System.Collections;
-
 using MelonLoader;
-
 using UnityEngine;
-
 using matechat.sdk.Feature;
 using matechat.util;
+using matechat.util.matechat.util;
 
 namespace matechat.feature
 {
@@ -18,6 +16,7 @@ namespace matechat.feature
         private Vector2 scrollPosition;
         private GUIStyle textStyle;
         private Rect windowRect;
+        private IAIEngine aiEngine; // Dynamically assigned AI engine
         private static readonly Color MikuTeal = new Color(0.07f, 0.82f, 0.82f, 0.95f);
         private static readonly Color DarkTeal = new Color(0.05f, 0.4f, 0.4f, 0.95f);
         private static readonly Color WindowBackground = new Color(0.1f, 0.1f, 0.1f, 0.95f);
@@ -30,12 +29,17 @@ namespace matechat.feature
 
         public ChatFeature() : base("Chat", Config.CHAT_KEYBIND.Value)
         {
-            textStyle = new GUIStyle();
-            textStyle.normal.textColor = Color.white;
-            textStyle.fontSize = Config.CHAT_WINDOW_FONT_SIZE.Value;
-            textStyle.wordWrap = true;
+            textStyle = new GUIStyle
+            {
+                normal = { textColor = Color.white },
+                fontSize = Config.CHAT_WINDOW_FONT_SIZE.Value,
+                wordWrap = true
+            };
             UpdateWindowRect();
             UpdateSettings();
+
+            // Dynamically assign the AI engine based on configuration
+            aiEngine = Core.GetAIEngine();
         }
 
         public void UpdateWindowRect()
@@ -58,15 +62,6 @@ namespace matechat.feature
             DrawWindow();
         }
 
-        private void HandleFocusEvents()
-        {
-            Event current = Event.current;
-            if (current?.type == EventType.MouseDown)
-            {
-                isChatFocused = windowRect.Contains(current.mousePosition);
-            }
-        }
-
         private void DrawWindow()
         {
             Color originalBgColor = GUI.backgroundColor;
@@ -77,6 +72,42 @@ namespace matechat.feature
             DrawInputArea();
             GUI.backgroundColor = originalBgColor;
         }
+        private void DrawChatContent()
+        {
+            GUI.backgroundColor = ContentBackground;
+            Rect contentRect = new Rect(
+                windowRect.x + Padding,
+                windowRect.y + TitleBarHeight + Padding,
+                windowRect.width - (Padding * 2),
+                windowRect.height - TitleBarHeight - InputHeight - (Padding * 3)
+            );
+            GUI.Box(contentRect, string.Empty);
+
+            // Allow manual scrolling when not sending/receiving messages
+            if (contentRect.Contains(Event.current.mousePosition) && !isWaitingForResponse)
+            {
+                float scroll = Input.mouseScrollDelta.y * 20f;
+                scrollPosition.y = Mathf.Clamp(scrollPosition.y - scroll, 0, Mathf.Max(0, responseText.Length - contentRect.height));
+            }
+
+            GUI.BeginGroup(contentRect);
+            GUI.Label(
+                new Rect(5, -scrollPosition.y, contentRect.width - 10, Mathf.Max(contentRect.height, responseText.Length)),
+                responseText,
+                textStyle
+            );
+            GUI.EndGroup();
+        }
+
+        private void LimitChatHistory()
+        {
+            string[] lines = responseText.Split('\n');
+            if (lines.Length > MaxChatHistory)
+            {
+                responseText = string.Join("\n", lines.Skip(lines.Length - MaxChatHistory));
+            }
+        }
+
 
         private void DrawShadow()
         {
@@ -169,94 +200,22 @@ namespace matechat.feature
             MelonCoroutines.Start(SendMessageCoroutine(userMessage));
         }
 
-        private string ProcessTextFormatting(string text)
-        {
-            if (string.IsNullOrEmpty(text)) return string.Empty;
-
-            text = text.Replace("\\n", "\n");
-
-            string[] messages = text.Split(new[] { "\n\n" }, StringSplitOptions.RemoveEmptyEntries);
-
-            for (int i = 0; i < messages.Length; i++)
-            {
-                if (messages[i].Contains("```"))
-                {
-                    messages[i] = messages[i].Replace("```", "\n");
-                }
-
-                if (messages[i].Contains("\n- "))
-                {
-                    messages[i] = messages[i].Replace("\n- ", "\n  • ");
-                }
-
-                if (System.Text.RegularExpressions.Regex.IsMatch(messages[i], @"\n\d+\."))
-                {
-                    messages[i] = System.Text.RegularExpressions.Regex.Replace(
-                        messages[i],
-                        @"\n(\d+\.)",
-                        m => $"\n  {m.Groups[1].Value}"
-                    );
-                }
-            }
-
-            return string.Join("\n\n", messages);
-        }
-
-        private void DrawChatContent()
-        {
-            GUI.backgroundColor = ContentBackground;
-            Rect contentRect = new Rect(
-                windowRect.x + Padding,
-                windowRect.y + TitleBarHeight + Padding,
-                windowRect.width - (Padding * 2),
-                windowRect.height - TitleBarHeight - InputHeight - (Padding * 3)
-            );
-            GUI.Box(contentRect, string.Empty);
-
-            string formattedText = ProcessTextFormatting(responseText);
-
-            float totalHeight = textStyle.CalcHeight(new GUIContent(formattedText), contentRect.width - 10);
-
-            // allow manual scrolling when not sending/receiving messages
-            if (contentRect.Contains(Event.current.mousePosition) && !isWaitingForResponse)
-            {
-                float scroll = Input.mouseScrollDelta.y * 20f;
-                scrollPosition.y = Mathf.Clamp(scrollPosition.y - scroll, 0, Mathf.Max(0, totalHeight - contentRect.height));
-            }
-
-            GUI.BeginGroup(contentRect);
-            GUI.Label(
-                new Rect(5, -scrollPosition.y, contentRect.width - 10, Mathf.Max(contentRect.height, totalHeight)),
-                formattedText,
-                textStyle
-            );
-            GUI.EndGroup();
-        }
-
-        private void AppendToChatHistory(string message)
-        {
-            if (responseText.Length > 0)
-                responseText += "\n\n";
-
-            message = ProcessTextFormatting(message);
-            responseText += message;
-
-            // scroll to bottom
-            float contentHeight = textStyle.CalcHeight(new GUIContent(responseText), windowRect.width - (Padding * 2) - 10);
-            float visibleHeight = windowRect.height - TitleBarHeight - InputHeight - (Padding * 3);
-            scrollPosition.y = Mathf.Max(0, contentHeight - visibleHeight);
-        }
-
         private IEnumerator SendMessageCoroutine(string userMessage)
         {
-            yield return CloudflareUtil.SendCloudflareRequest(userMessage);
+            yield return aiEngine.SendRequest(userMessage, Config.SYSTEM_PROMPT.Value, (response, error) =>
+            {
+                if (!string.IsNullOrEmpty(response))
+                {
+                    AppendToChatHistory($"{Config.AI_NAME.Value}: {response}");
+                }
+                else
+                {
+                    AppendToChatHistory($"Error: {error}");
+                }
+            });
+
             isWaitingForResponse = false;
             LimitChatHistory();
-
-            // scroll to bottom after response
-            float contentHeight = textStyle.CalcHeight(new GUIContent(responseText), windowRect.width - (Padding * 2) - 10);
-            float visibleHeight = windowRect.height - TitleBarHeight - InputHeight - (Padding * 3);
-            scrollPosition.y = Mathf.Max(0, contentHeight - visibleHeight);
         }
 
         private void ClearChat()
@@ -266,29 +225,12 @@ namespace matechat.feature
             scrollPosition = Vector2.zero;
         }
 
-        public void UpdateTypingMessage(string newMessage)
+        private void AppendToChatHistory(string message)
         {
-            newMessage = newMessage.Replace("\\\"", "\"")
-                                  .Replace("\\\\", "\\");
+            if (responseText.Length > 0)
+                responseText += "\n\n";
 
-            responseText = responseText.Replace(
-                Config.AI_NAME.Value + ": typing...",
-                Config.AI_NAME.Value + $": {newMessage}"
-            );
-
-            // scroll to bottom after updating
-            float contentHeight = textStyle.CalcHeight(new GUIContent(responseText), windowRect.width - (Padding * 2) - 10);
-            float visibleHeight = windowRect.height - TitleBarHeight - InputHeight - (Padding * 3);
-            scrollPosition.y = Mathf.Max(0, contentHeight - visibleHeight);
-        }
-
-        private void LimitChatHistory()
-        {
-            string[] lines = responseText.Split('\n');
-            if (lines.Length > MaxChatHistory)
-            {
-                responseText = string.Join("\n", lines.Skip(lines.Length - MaxChatHistory));
-            }
+            responseText += message;
         }
 
         public void UpdateSettings()
