@@ -2,14 +2,13 @@ using System.Collections;
 using UnityEngine.Networking;
 using System.Text;
 using MelonLoader;
-using matechat.util.matechat.util;
-using UnityEngine;
 
 namespace matechat.util
 {
     public class CloudflareUtil : IAIEngine
     {
-        public IEnumerator SendRequest(string userMessage, string systemPrompt, System.Action<string, string> callback)
+        public IEnumerator SendRequest(string userMessage, string systemPrompt,
+                                       System.Action<string, string> callback)
         {
             if (!Config.TestConfig())
             {
@@ -20,13 +19,15 @@ namespace matechat.util
             systemPrompt ??= Config.SYSTEM_PROMPT.Value;
             string requestJson = CreateRequestJson(systemPrompt, userMessage);
 
-            UnityWebRequest webRequest = new UnityWebRequest(Config.GetAPIUrl(), "POST");
+            UnityWebRequest webRequest =
+                new UnityWebRequest(Config.GetAPIUrl(), "POST");
             byte[] jsonToSend = Encoding.UTF8.GetBytes(requestJson);
 
             webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/json");
-            webRequest.SetRequestHeader("Authorization", $"Bearer {Config.API_KEY.Value}");
+            webRequest.SetRequestHeader("Authorization",
+                                        $"Bearer {Config.API_KEY.Value}");
 
             yield return webRequest.SendWebRequest();
 
@@ -47,14 +48,14 @@ namespace matechat.util
                         errorMessage = "Authentication failed - please check your API key!";
                         break;
                     case 404:
-                        errorMessage = "API URL not found - please check your account ID and endpoint!";
+                        errorMessage =
+                            "API URL not found - please check your account ID and endpoint!";
                         break;
                 }
 
                 callback(null, errorMessage);
             }
         }
-
 
         public IEnumerator TestEngine(System.Action<bool, string> callback)
         {
@@ -64,14 +65,15 @@ namespace matechat.util
                 yield break;
             }
 
-            string testMessage = CreateRequestJson("This is a system test prompt.", "This is a user test message.");
-
+            string testMessage = CreateRequestJson("This is a system test prompt.",
+                                                   "This is a user test message.");
 
             yield return SendRequest("Test", "test", (response, error) =>
             {
                 if (!string.IsNullOrEmpty(response))
                 {
-                    MelonLogger.Msg("Cloudflare test successful! Your config is ready to use.");
+                    MelonLogger.Msg(
+                        "Cloudflare test successful! Your config is ready to use.");
                     callback(true, null);
                 }
                 else
@@ -82,8 +84,8 @@ namespace matechat.util
             });
         }
 
-
-        private static string CreateRequestJson(string systemPrompt, string userMessage)
+        private static string CreateRequestJson(string systemPrompt,
+                                                string userMessage)
         {
             return $"{{\"prompt\":\"{JsonUtil.EscapeJsonString(systemPrompt)}\\n{JsonUtil.EscapeJsonString(userMessage)}\"}}";
         }
@@ -94,10 +96,8 @@ namespace matechat.util
             {
                 // Match "result.response"
                 var match = System.Text.RegularExpressions.Regex.Match(
-                    jsonResponse,
-                    "\"response\"\\s*:\\s*\"(.*?)\"",
-                    System.Text.RegularExpressions.RegexOptions.Singleline
-                );
+                    jsonResponse, "\"response\"\\s*:\\s*\"(.*?)\"",
+                    System.Text.RegularExpressions.RegexOptions.Singleline);
 
                 if (!match.Success)
                 {
@@ -114,39 +114,17 @@ namespace matechat.util
             }
         }
 
-
-
-
-        private string HandleError(UnityWebRequest webRequest)
+        [System.Serializable]
+        public class CloudflareResponse
         {
-            string errorMessage = webRequest.error;
-
-            switch (webRequest.responseCode)
-            {
-                case 401:
-                case 403:
-                    errorMessage = "Authentication failed - please check your API key!";
-                    break;
-                case 404:
-                    errorMessage = "API URL not found - please check your account ID and endpoint!";
-                    break;
-            }
-
-            MelonLogger.Error($"Request failed: {errorMessage}");
-            return errorMessage;
+            public Result result;
+            public bool success;
         }
-    }
 
-    [System.Serializable]
-    public class CloudflareResponse
-    {
-        public Result result;
-        public bool success;
-    }
-
-    [System.Serializable]
-    public class Result
-    {
-        public string response;
+        [System.Serializable]
+        public class Result
+        {
+            public string response;
+        }
     }
 }
