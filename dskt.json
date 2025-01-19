@@ -1,7 +1,8 @@
 {
-  "description": "A MelonLoader mod that lets you chat with your Desktop Mate using AI! ♪",
-  "author":"dvhsh",
-  "category" : ["Overhaul"],
+  "author": "dvhsh",
+  "discord": "1268515411465343038", 
+  "version": "1.0.4",
   "type": "MelonLoader",
-  "version" : "1.0.4"
+  "category": ["Overhaul"],
+  "description": "A MelonLoader mod that lets you chat with your Desktop Mate using AI! ♪"
 }
