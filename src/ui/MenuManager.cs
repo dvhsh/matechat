@@ -42,57 +42,65 @@ namespace matechat.ui
             if (rootPage != null)
             {
                 rootPageObj = rootPage.gameObject;
-                settingsPage = new SettingsPage(menuParent, rootPageObj, menuManager, uniWindowController);
+                settingsPage = new SettingsPage(menuParent, rootPageObj, menuManager,
+                                                uniWindowController);
             }
         }
         private void CreateMenuButton()
         {
             try
             {
-                Transform contentTransform = GameObject.Find(Constants.UI.CONTENT_PATH)?.transform;
+                Transform contentTransform =
+                    GameObject.Find(Constants.UI.CONTENT_PATH)?.transform;
                 if (contentTransform != null)
                 {
-                    Button existingButton = contentTransform.GetComponentInChildren<Button>();
+                    Button existingButton =
+                        contentTransform.GetComponentInChildren<Button>();
                     if (existingButton != null)
                     {
-                        GameObject buttonObj = GameObject.Instantiate(existingButton.gameObject, contentTransform);
+                        GameObject buttonObj = GameObject.Instantiate(
+                            existingButton.gameObject, contentTransform);
                         buttonObj.name = "MateChatButton";
                         buttonObj.transform.SetSiblingIndex(0);
 
                         Image buttonImage = buttonObj.GetComponent<Image>();
                         if (buttonImage != null)
                         {
-                            buttonImage.sprite = EmbeddedAssets.LoadButtonSprite(EmbeddedAssets.SettingsButton);
+                            buttonImage.sprite = EmbeddedAssets.LoadButtonSprite(
+                                EmbeddedAssets.SettingsButton);
                             buttonImage.type = Image.Type.Simple;
                             buttonImage.preserveAspect = true;
                         }
 
-                        foreach (Text text in buttonObj.GetComponentsInChildren<Text>(true))
+                        foreach (Text text in buttonObj.GetComponentsInChildren<Text>(
+                                     true))
                         {
                             text.text = "MateChat";
                         }
 
                         Button button = buttonObj.GetComponent<Button>();
                         button.onClick = new Button.ButtonClickedEvent();
-                        button.onClick.AddListener((UnityEngine.Events.UnityAction)delegate
-                        {
-                            if (menuManager != null)
-                            {
-                                Component[] components = menuManager.GetComponents<Component>();
-                                if (components.Length > 1)
+                        button.onClick.AddListener((
+                            UnityEngine.Events.UnityAction)delegate {
+                                if (menuManager != null)
                                 {
-                                    components[1].SendMessage("Open", SendMessageOptions.DontRequireReceiver);
+                                    Component[] components = menuManager.GetComponents<Component>();
+                                    if (components.Length > 1)
+                                    {
+                                        components[1].SendMessage(
+                                "Open", SendMessageOptions.DontRequireReceiver);
+                                    }
                                 }
-                            }
-                            rootPageObj.SetActive(false);
-                            settingsPage.Show();
-                        });
+                                rootPageObj.SetActive(false);
+                                settingsPage.Show();
+                            });
                     }
                 }
             }
             catch (System.Exception ex)
             {
-                MelonLogger.Error($"Error creating button: {ex.Message}\nStack trace: {ex.StackTrace}");
+                MelonLogger.Error(
+                    $"Error creating button: {ex.Message}\nStack trace: {ex.StackTrace}");
             }
         }
     }
