@@ -2,7 +2,7 @@ using System.Collections;
 using MelonLoader;
 using UnityEngine;
 using matechat.sdk.Feature;
-using matechat.util;
+using matechat.util.matechat.util;
 
 namespace matechat.feature
 {

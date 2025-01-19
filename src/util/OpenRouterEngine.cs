@@ -81,8 +81,11 @@ namespace matechat.util
 
         private string ParseResponse(string jsonResponse)
         {
+            MelonLogger.Msg(jsonResponse);
+
             try
             {
+
                 // Use Regex to extract the "content" field in the first "message" object
                 var match = System.Text.RegularExpressions.Regex.Match(jsonResponse, "\"content\":\"(.*?)\"");
                 if (match.Success)
