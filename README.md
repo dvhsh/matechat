@@ -5,8 +5,6 @@
 
 MateChat adds a cute chat interface to Desktop Mate, powered by Cloudflare's AI Workers running the Llama 2 language model. Have natural conversations with your mate in an adorable interface designed to match Desktop Mate's aesthetic~ ✧
 
-[![Discord][discord-shield]][discord-url]
-
 ## ✨ Features
 - Chat with your Desktop Mate using AI
 - Cute and minimal interface that matches the game's style
@@ -63,5 +61,4 @@ The mod automatically tests your config on startup and reloads, checking if your
 ---
 Made with ♥ for Desktop Mate
 
-[discord-shield]: https://img.shields.io/discord/1328217579340304384?color=7289da&label=Discord&logo=discord&logoColor=white&style=for-the-badge
 [discord-url]: https://discord.gg/Xu7pEU24kw
