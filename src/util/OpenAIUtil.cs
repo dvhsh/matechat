@@ -1,14 +1,14 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine.Networking;
 using System.Text;
 using MelonLoader;
-using matechat.util.matechat.util;
 
 namespace matechat.util
 {
     public class OpenAIUtil : IAIEngine
     {
-        public IEnumerator SendRequest(string userMessage, string systemPrompt, System.Action<string, string> callback)
+        public IEnumerator SendRequest(string userMessage, string systemPrompt,
+                                       System.Action<string, string> callback)
         {
             if (!Config.TestConfig())
             {
@@ -19,13 +19,15 @@ namespace matechat.util
             // Construct the request payload
             string requestJson = CreateRequestJson(systemPrompt, userMessage);
 
-            UnityWebRequest webRequest = new UnityWebRequest(Config.GetAPIUrl(), "POST");
+            UnityWebRequest webRequest =
+                new UnityWebRequest(Config.GetAPIUrl(), "POST");
             byte[] jsonToSend = Encoding.UTF8.GetBytes(requestJson);
 
             webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/json");
-            webRequest.SetRequestHeader("Authorization", $"Bearer {Config.API_KEY.Value}");
+            webRequest.SetRequestHeader("Authorization",
+                                        $"Bearer {Config.API_KEY.Value}");
 
             yield return webRequest.SendWebRequest();
 
@@ -50,21 +52,25 @@ namespace matechat.util
                 yield break;
             }
 
-            string testMessage = CreateRequestJson("Test system prompt", "This is a test message to validate the configuration.");
+            string testMessage = CreateRequestJson(
+                "Test system prompt",
+                "This is a test message to validate the configuration.");
 
-            yield return SendRequest("This is a test message to validate the configuration.", "Test system prompt", (response, error) =>
-            {
-                if (!string.IsNullOrEmpty(response))
-                {
-                    MelonLogger.Msg("OpenAI test successful! Your config is ready to use.");
-                    callback(true, null);
-                }
-                else
-                {
-                    MelonLogger.Error($"OpenAI test failed: {error}");
-                    callback(false, error);
-                }
-            });
+            yield return SendRequest(
+                "This is a test message to validate the configuration.",
+                "Test system prompt", (response, error) => {
+                    if (!string.IsNullOrEmpty(response))
+                    {
+                        MelonLogger.Msg(
+                      "OpenAI test successful! Your config is ready to use.");
+                        callback(true, null);
+                    }
+                    else
+                    {
+                        MelonLogger.Error($"OpenAI test failed: {error}");
+                        callback(false, error);
+                    }
+                });
         }
 
         private string CreateRequestJson(string systemPrompt, string userMessage)
@@ -74,8 +80,7 @@ namespace matechat.util
                    $"\"messages\":[" +
                    $"{{\"role\":\"system\",\"content\":\"{JsonUtil.EscapeJsonString(systemPrompt)}\"}}," +
                    $"{{\"role\":\"user\",\"content\":\"{JsonUtil.EscapeJsonString(userMessage)}\"}}" +
-                   $"]" +
-                   $"}}";
+                   $"]" + $"}}";
         }
         private string ParseResponse(string jsonResponse)
         {
@@ -83,10 +88,8 @@ namespace matechat.util
             {
                 // Improved regex for matching "content"
                 var match = System.Text.RegularExpressions.Regex.Match(
-                    jsonResponse,
-                    "\"content\"\\s*:\\s*\"(.*?)\"",
-                    System.Text.RegularExpressions.RegexOptions.Singleline
-                );
+                    jsonResponse, "\"content\"\\s*:\\s*\"(.*?)\"",
+                    System.Text.RegularExpressions.RegexOptions.Singleline);
 
                 if (!match.Success)
                 {
@@ -106,13 +109,13 @@ namespace matechat.util
             }
         }
 
-
         private string HandleError(UnityWebRequest webRequest)
         {
             string errorMessage = webRequest.error;
             string responseText = webRequest.downloadHandler?.text;
 
-            MelonLogger.Error($"Request failed: {errorMessage}. Response: {responseText}");
+            MelonLogger.Error(
+                $"Request failed: {errorMessage}. Response: {responseText}");
 
             return errorMessage;
         }
