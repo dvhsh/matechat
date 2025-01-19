@@ -1,4 +1,4 @@
-<img src="https://github.com/dvhsh/matechat/blob/33f43ca38d2cde69efd7a35a66dedcbbf5f6734b/matechat.png" alt="MateChat Banner" width="100%">
+<img src="matechat.png" alt="MateChat Banner" width="100%">
 
 # MateChat
 > A MelonLoader mod that lets you chat with your Desktop Mate using AI! ♪
