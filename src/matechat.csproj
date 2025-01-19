@@ -1,0 +1,433 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>disable</Nullable>
+		<RootNamespace>matechat</RootNamespace>
+		<LangVersion>default</LangVersion>
+		<IsPackable>false</IsPackable>
+		<AssemblyVersion>1.0.0.0</AssemblyVersion>
+		<FileVersion>1.0.0.0</FileVersion>
+		<NeutralLanguage>en-US</NeutralLanguage>
+		<AssemblyName>matechat</AssemblyName>
+		<LangVersion>latest</LangVersion>
+		<ImplicitUsings>enable</ImplicitUsings>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Reference Include="Assembly-CSharp-firstpass">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Assembly-CSharp-firstpass.dll</HintPath>
+		</Reference>
+		<Reference Include="Assembly-CSharp">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Assembly-CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2Cppcom.rlabrecque.steamworks.net">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2Cppcom.rlabrecque.steamworks.net.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppDOTween">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppDOTween.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2Cppendel.nativewebsocket">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2Cppendel.nativewebsocket.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppFastSpringBone10">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppFastSpringBone10.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppMagicaClothV2">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppMagicaClothV2.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppMono.Security">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppMono.Security.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2Cppmscorlib.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppMToon">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppMToon.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppNewtonsoft.Json">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppNewtonsoft.Json.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppPixiv.VroidSdk">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppPixiv.VroidSdk.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppPixiv.VroidSdk.Unity">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppPixiv.VroidSdk.Unity.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Configuration">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Configuration.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Core">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Core.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Data">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Data.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Net.Http">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Net.Http.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Numerics">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Numerics.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Runtime.Serialization">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Runtime.Serialization.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.ServiceModel.Internals">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.ServiceModel.Internals.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Xml">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Xml.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppSystem.Xml.Linq">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppSystem.Xml.Linq.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppuDesktopDuplication.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppuDesktopDuplication.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppUniGLTF">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppUniGLTF.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppUniGLTF.Utils">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppUniGLTF.Utils.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppUniHumanoid">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppUniHumanoid.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppuWindowCapture.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppuWindowCapture.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRM10">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRM10.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRM10.Samples.URPSample">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRM10.Samples.URPSample.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRM10.Samples.VRM10FirstPersonSample">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRM10.Samples.VRM10FirstPersonSample.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRM10.Samples.VRM10RuntimeExporter">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRM10.Samples.VRM10RuntimeExporter.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRM10.Samples.VRM10Viewer">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRM10.Samples.VRM10Viewer.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVrmLib">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVrmLib.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRMShaders.GLTF.IO.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRMShaders.GLTF.IO.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRMShaders.GLTF.UniUnlit.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRMShaders.GLTF.UniUnlit.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRMShaders.VRM.IO.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRMShaders.VRM.IO.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRMShaders.VRM10.Format.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRMShaders.VRM10.Format.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRMShaders.VRM10.MToon10.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRMShaders.VRM10.MToon10.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRoidSDK">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRoidSDK.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppVRoidSDK.Examples">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2CppVRoidSDK.Examples.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2Cpp__Generated">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Il2Cpp__Generated.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.2D.Animation.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.2D.Animation.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.Burst">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.Burst.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.Burst.Unsafe">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.Burst.Unsafe.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.Collections">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.Collections.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.Collections.LowLevel.ILSupport">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.Collections.LowLevel.ILSupport.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.InputSystem">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.InputSystem.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.InputSystem.ForUI">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.InputSystem.ForUI.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.InternalAPIEngineBridge.001">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.InternalAPIEngineBridge.001.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.Mathematics">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.Mathematics.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.RenderPipeline.Universal.ShaderLibrary">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.RenderPipeline.Universal.ShaderLibrary.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.RenderPipelines.Core.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.RenderPipelines.Core.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.RenderPipelines.Universal.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.RenderPipelines.Universal.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.TextMeshPro">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.TextMeshPro.dll</HintPath>
+		</Reference>
+		<Reference Include="Unity.UniWindowController">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Unity.UniWindowController.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AccessibilityModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AccessibilityModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AIModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AIModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AndroidJNIModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AndroidJNIModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AnimationModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AnimationModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ARModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ARModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AssetBundleModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AssetBundleModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.AudioModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AudioModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ClothModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ClothModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ClusterInputModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ClusterInputModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ClusterRendererModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ClusterRendererModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ContentLoadModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ContentLoadModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.CrashReportingModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.CrashReportingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.DirectorModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.DirectorModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.DSPGraphModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.DSPGraphModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.GameCenterModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.GameCenterModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.GIModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.GIModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.GridModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.GridModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.HotReloadModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.HotReloadModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ImageConversionModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ImageConversionModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.IMGUIModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.IMGUIModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.InputLegacyModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.InputModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.InputModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.JSONSerializeModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.JSONSerializeModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.LocalizationModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.LocalizationModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.NVIDIAModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.NVIDIAModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ParticleSystemModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ParticleSystemModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.PerformanceReportingModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.PerformanceReportingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.Physics2DModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.Physics2DModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.PhysicsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ProfilerModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ProfilerModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.PropertiesModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.PropertiesModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.RuntimeInitializeOnLoadManagerInitializerModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ScreenCaptureModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.ScreenCaptureModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.SharedInternalsModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.SharedInternalsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.SpriteMaskModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.SpriteMaskModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.SpriteShapeModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.SpriteShapeModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.StreamingModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.StreamingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.SubstanceModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.SubstanceModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.SubsystemsModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.SubsystemsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TerrainModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.TerrainModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TerrainPhysicsModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.TerrainPhysicsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TextCoreFontEngineModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.TextCoreFontEngineModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TextCoreTextEngineModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.TextCoreTextEngineModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TextRenderingModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.TextRenderingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TilemapModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.TilemapModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.TLSModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.TLSModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UI">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UI.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UIElementsModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UIElementsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UIModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UIModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UmbraModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UmbraModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityAnalyticsCommonModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityAnalyticsCommonModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityAnalyticsModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityAnalyticsModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityConnectModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityConnectModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityCurlModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityCurlModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityTestProtocolModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityTestProtocolModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityWebRequestAssetBundleModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestAssetBundleModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityWebRequestAudioModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestAudioModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityWebRequestModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityWebRequestTextureModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestTextureModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.UnityWebRequestWWWModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.UnityWebRequestWWWModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.VehiclesModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.VehiclesModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.VFXModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.VFXModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.VideoModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.VideoModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.VirtualTexturingModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.VirtualTexturingModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.VRModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.VRModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.WindModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.WindModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.XRModule">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.XRModule.dll</HintPath>
+		</Reference>
+		<Reference Include="MelonLoader">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\net6\MelonLoader.dll</HintPath>
+		</Reference>
+		<Reference Include="0Harmony">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\net6\0Harmony.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.Runtime">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\net6\Il2CppInterop.Runtime.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2CppInterop.Common">
+			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
+		</Reference>
+
+	</ItemGroup>
+
+	<PropertyGroup>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="AssemblyInfo.cs" />
+        <Compile Include="Config.cs" />
+        <Compile Include="Constants.cs" />
+        <Compile Include="Core.cs" />
+        <Compile Include="feature\ChatFeature.cs" />
+        <Compile Include="sdk\Feature.cs" />
+        <Compile Include="ui\EmbeddedAssets.cs" />
+        <Compile Include="ui\MenuManager.cs" />
+        <Compile Include="ui\Pages.cs" />
+        <Compile Include="util\CloudflareUtil.cs" />
+        <Compile Include="util\IAIEngine.cs" />
+        <Compile Include="util\JsonUtil.cs" />
+        <Compile Include="util\OpenAIUtil.cs" />
+        <Compile Include="util\OpenRouterEngine.cs" />
+	</ItemGroup>
+	
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\SteamLibrary\steamapps\common\Desktop Mate\Mods&quot;" />
+	</Target>
+</Project>
