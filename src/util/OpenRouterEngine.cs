@@ -1,15 +1,14 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine.Networking;
 using System.Text;
 using MelonLoader;
-using matechat.util.matechat.util;
-using UnityEngine;
 
 namespace matechat.util
 {
     public class OpenRouterEngine : IAIEngine
     {
-        public IEnumerator SendRequest(string userMessage, string systemPrompt, System.Action<string, string> callback)
+        public IEnumerator SendRequest(string userMessage, string systemPrompt,
+                                       System.Action<string, string> callback)
         {
             if (!Config.TestConfig())
             {
@@ -26,7 +25,8 @@ namespace matechat.util
             webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/json");
-            webRequest.SetRequestHeader("Authorization", $"Bearer {Config.API_KEY.Value}");
+            webRequest.SetRequestHeader("Authorization",
+                                        $"Bearer {Config.API_KEY.Value}");
 
             yield return webRequest.SendWebRequest();
 
@@ -51,21 +51,25 @@ namespace matechat.util
                 yield break;
             }
 
-            string testMessage = CreateRequestJson("Test system prompt", "This is a test message to validate the configuration.");
+            string testMessage = CreateRequestJson(
+                "Test system prompt",
+                "This is a test message to validate the configuration.");
 
-            yield return SendRequest("This is a test message to validate the configuration.", "Test system prompt", (response, error) =>
-            {
-                if (!string.IsNullOrEmpty(response))
-                {
-                    MelonLogger.Msg("OpenRouter test successful! Your config is ready to use.");
-                    callback(true, null);
-                }
-                else
-                {
-                    MelonLogger.Error($"OpenRouter test failed: {error}");
-                    callback(false, error);
-                }
-            });
+            yield return SendRequest(
+                "This is a test message to validate the configuration.",
+                "Test system prompt", (response, error) => {
+                    if (!string.IsNullOrEmpty(response))
+                    {
+                        MelonLogger.Msg(
+                      "OpenRouter test successful! Your config is ready to use.");
+                        callback(true, null);
+                    }
+                    else
+                    {
+                        MelonLogger.Error($"OpenRouter test failed: {error}");
+                        callback(false, error);
+                    }
+                });
         }
 
         private string CreateRequestJson(string systemPrompt, string userMessage)
@@ -75,19 +79,22 @@ namespace matechat.util
                    $"\"messages\":[" +
                    $"{{\"role\":\"system\",\"content\":\"{JsonUtil.EscapeJsonString(systemPrompt)}\"}}," +
                    $"{{\"role\":\"user\",\"content\":\"{JsonUtil.EscapeJsonString(userMessage)}\"}}" +
-                   $"]" +
-                   $"}}";
+                   $"]" + $"}}";
         }
 
         private string ParseResponse(string jsonResponse)
         {
             try
             {
-                // Use Regex to extract the "content" field in the first "message" object
-                var match = System.Text.RegularExpressions.Regex.Match(jsonResponse, "\"content\":\"(.*?)\"");
+                // Use Regex to extract the "content" field in the first "message"
+                // object
+                var match = System.Text.RegularExpressions.Regex.Match(
+                    jsonResponse, "\"content\":\"(.*?)\"");
                 if (match.Success)
                 {
-                    return match.Groups[1].Value.Replace("\\n", "\n").Replace("\\\"", "\"");
+                    return match.Groups[1]
+                        .Value.Replace("\\n", "\n")
+                        .Replace("\\\"", "\"");
                 }
 
                 return "Error: Unable to find content in the response.";
@@ -99,13 +106,13 @@ namespace matechat.util
             }
         }
 
-
         private string HandleError(UnityWebRequest webRequest)
         {
             string errorMessage = webRequest.error;
             string responseText = webRequest.downloadHandler?.text;
 
-            MelonLogger.Error($"Request failed: {errorMessage}. Response: {responseText}");
+            MelonLogger.Error(
+                $"Request failed: {errorMessage}. Response: {responseText}");
 
             return errorMessage;
         }
@@ -114,18 +121,18 @@ namespace matechat.util
     [System.Serializable]
     public class TopLevelResponse
     {
-        public Choice[] choices; // Top-level array of choices
+        public Choice[] choices;  // Top-level array of choices
     }
 
     [System.Serializable]
     public class Choice
     {
-        public Message message; // Nested message object
+        public Message message;  // Nested message object
     }
 
     [System.Serializable]
     public class Message
     {
-        public string content; // Actual content from the assistant
+        public string content;  // Actual content from the assistant
     }
 }
