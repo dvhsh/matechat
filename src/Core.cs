@@ -2,14 +2,11 @@ using MelonLoader;
 using UnityEngine;
 
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 
 using matechat.sdk.Feature;
 using matechat.feature;
 using matechat.ui;
 using matechat.util;
-using matechat.util.matechat.util;
 
 namespace matechat
 {
@@ -19,7 +16,6 @@ namespace matechat
         private MenuManager menuManager;
         private bool isInitialized;
 
-        // Field to store the selected AI engine
         private static IAIEngine aiEngine;
 
         public override void OnApplicationStart()
@@ -74,7 +70,8 @@ namespace matechat
                         break;
 
                     default:
-                        MelonLogger.Error($"Unsupported AI engine type: {Config.ENGINE_TYPE.Value}");
+                        MelonLogger.Error(
+                            $"Unsupported AI engine type: {Config.ENGINE_TYPE.Value}");
                         throw new System.Exception("Invalid AI engine configuration.");
                 }
             }
@@ -89,7 +86,7 @@ namespace matechat
         {
             try
             {
-                InitializeAIEngine(); // Call the private method internally
+                InitializeAIEngine();
                 MelonLogger.Msg("AI engine reloaded successfully.");
             }
             catch (System.Exception ex)
@@ -108,7 +105,6 @@ namespace matechat
             return features?.FirstOrDefault(f => f is ChatFeature) as ChatFeature;
         }
 
-        // Method to retrieve the selected AI engine
         public static IAIEngine GetAIEngine()
         {
             if (aiEngine == null)
@@ -120,7 +116,8 @@ namespace matechat
 
         public override void OnLateUpdate()
         {
-            if (!isInitialized || features == null) return;
+            if (!isInitialized || features == null)
+                return;
 
             foreach (var feature in features)
             {
@@ -140,7 +137,8 @@ namespace matechat
 
         public override void OnGUI()
         {
-            if (!isInitialized || features == null) return;
+            if (!isInitialized || features == null)
+                return;
 
             foreach (var feature in features)
             {
