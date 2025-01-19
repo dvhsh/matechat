@@ -104,9 +104,11 @@ namespace matechat.util
                     return "Error: Unable to find 'response' in the Cloudflare response.";
                 }
 
+                // Extract and unescape the content
                 string response = match.Groups[1].Value;
+                response = JsonUtil.UnescapeJsonString(response);
 
-                return response.Replace("\\n", "\n").Replace("\\\"", "\"");
+                return response;
             }
             catch (System.Exception)
             {

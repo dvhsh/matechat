@@ -12,5 +12,16 @@ namespace matechat.util
                 .Replace("\t", "\\t")
                 .Replace("\\", "\\\\");
         }
+
+        public static string UnescapeJsonString(string str)
+        {
+            if (string.IsNullOrEmpty(str)) return str;
+
+            return str.Replace("\\\"", "\"")
+                      .Replace("\\n", "\n")
+                      .Replace("\\r", "\r")
+                      .Replace("\\t", "\t")
+                      .Replace("\\\\", "\\");
+        }
     }
 }

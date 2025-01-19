@@ -97,10 +97,11 @@ namespace matechat.util
                     return "Error: Unable to find 'content' in the response.";
                 }
 
-                // Extract and clean the content
+                // Extract and unescape the content
                 string content = match.Groups[1].Value;
+                content = JsonUtil.UnescapeJsonString(content);
 
-                return content.Replace("\\n", "\n").Replace("\\\"", "\"");
+                return content;
             }
             catch (System.Exception ex)
             {

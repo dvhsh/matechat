@@ -86,15 +86,20 @@ namespace matechat.util
         {
             try
             {
-                // Use Regex to extract the "content" field in the first "message"
-                // object
+                // Use Regex to extract the "content" field in the first "message" object
                 var match = System.Text.RegularExpressions.Regex.Match(
-                    jsonResponse, "\"content\":\"(.*?)\"");
+                    jsonResponse,
+                    "\"content\":\"(.*?)\"",
+                    System.Text.RegularExpressions.RegexOptions.Singleline
+                );
+
                 if (match.Success)
                 {
-                    return match.Groups[1]
-                        .Value.Replace("\\n", "\n")
-                        .Replace("\\\"", "\"");
+                    // Extract and unescape the content
+                    string content = match.Groups[1].Value;
+                    content = JsonUtil.UnescapeJsonString(content);
+
+                    return content;
                 }
 
                 return "Error: Unable to find content in the response.";
@@ -105,6 +110,7 @@ namespace matechat.util
                 return "Error: Unable to parse response.";
             }
         }
+
 
         private string HandleError(UnityWebRequest webRequest)
         {
