@@ -27,14 +27,13 @@ MateChat adds a cute chat interface to Desktop Mate, powered by Cloudflare's AI 
    - Right-click and select MateChat from the menu
    - Click "Open Config" and add your Cloudflare credentials:
      - `API_KEY` (your API token)
-     - `API_URL` (your worker URL)
+     - `ACCOUNT_ID` (your Cloudflare account id)
    - Click "Reload Config"
 
 Need help setting up your Cloudflare AI Worker? Follow this [quick guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)!
 
 ## Example Config
 ```
-[MateChat]
 [MateChat]
 CHAT_KEYBIND = "F8"
 ENGINE_TYPE = "Cloudflare"
