@@ -123,22 +123,4 @@ namespace matechat.util
             return errorMessage;
         }
     }
-
-    [System.Serializable]
-    public class TopLevelResponse
-    {
-        public Choice[] choices;  // Top-level array of choices
-    }
-
-    [System.Serializable]
-    public class Choice
-    {
-        public Message message;  // Nested message object
-    }
-
-    [System.Serializable]
-    public class Message
-    {
-        public string content;  // Actual content from the assistant
-    }
 }

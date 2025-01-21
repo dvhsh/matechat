@@ -389,6 +389,7 @@
 	<PropertyGroup>
 		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+		<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -396,12 +397,14 @@
 		<Compile Include="Config.cs" />
 		<Compile Include="Constants.cs" />
 		<Compile Include="Core.cs" />
+		<Compile Include="database\DatabaseManager.cs" />
 		<Compile Include="feature\ChatFeature.cs" />
 		<Compile Include="sdk\Feature.cs" />
 		<Compile Include="ui\EmbeddedAssets.cs" />
 		<Compile Include="ui\MenuManager.cs" />
 		<Compile Include="ui\Pages.cs" />
 		<Compile Include="util\CloudflareUtil.cs" />
+		<Compile Include="util\EngineHandle.cs" />
 		<Compile Include="util\IAIEngine.cs" />
 		<Compile Include="util\JsonUtil.cs" />
 		<Compile Include="util\OpenAIUtil.cs" />
