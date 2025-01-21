@@ -404,6 +404,7 @@
 		<Compile Include="ui\MenuManager.cs" />
 		<Compile Include="ui\Pages.cs" />
 		<Compile Include="util\CloudflareUtil.cs" />
+		<Compile Include="util\CloudflareWrapper.cs" />
 		<Compile Include="util\EngineHandle.cs" />
 		<Compile Include="util\IAIEngine.cs" />
 		<Compile Include="util\JsonUtil.cs" />
