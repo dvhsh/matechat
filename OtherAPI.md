@@ -83,18 +83,3 @@ CHAT_WINDOW_Y = 20
 CHAT_WINDOW_FONT_SIZE = 16
 ```
 
-## 💭 Coming Soon
-- Support for multiple LLM APIs
-- Visual improvements including speech bubbles
-- Desktop Mate animations integration
-- And more! ♪
-
-## 🌟 Support
-Join our [Discord server][discord-url] for help, updates, and cute chat screenshots!
-
-The mod automatically tests your config on startup and reloads, checking if your worker is setup correctly. Check the MelonLoader console for detailed feedback~
-
----
-Made with ♥ for Desktop Mate
-
-[discord-url]: https://discord.gg/Xu7pEU24kw
