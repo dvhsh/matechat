@@ -34,6 +34,11 @@ Need help setting up your Cloudflare AI Worker? Follow this [quick guide](https:
         - Give the key a name and click Create.
     - Copy the key that is created. This is the only time you will see the key.
     - The key that you just created will be added to the config file as the API_KEY.
+3. Click OpenRouter in the upper left to return to the main dashboard.
+4. Click Browse in the middle.
+    - On the left, select Roleplay under Categories.
+    - Select a Model, such as 'llama-3.1-8b-instruct' and click on it
+    - This will take you to the page where you will find the MODEL_NAME. You will need the full name, which is listed immediately under the heading. In this case, "meta-llama/llama-3.1-8b-instruct". You will use that as your MODEL_NAME in the configuration.
 
 
 ## OpenAI
@@ -64,6 +69,8 @@ Need help setting up your Cloudflare AI Worker? Follow this [quick guide](https:
      - `API_KEY` (. your API token)
      - `ACCOUNT_ID` (your account id. This is not needed for OpenAI )
    - Click "Reload Config"
+   - ENGINE_TYPE is case sensitive. "Cloudflare", OpenRouter", and "OpenAI" are the correct formats.
+   - If you are changing the ENGINE_TYPE, you may need to exit Desktop Mate completely and restart it after you have made your configuration changes.
 
 
 ## Example Config
