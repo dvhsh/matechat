@@ -69,6 +69,11 @@ namespace matechat
                         MelonLogger.Msg("Using OpenAI engine.");
                         break;
 
+                    case "OpenAICompatible":
+                        aiEngine = new OpenAIUtil();
+                        MelonLogger.Msg("Using OpenAI(OpenAICompatible) engine.");
+                        break;
+
                     default:
                         MelonLogger.Error(
                             $"Unsupported AI engine type: {Config.ENGINE_TYPE.Value}");

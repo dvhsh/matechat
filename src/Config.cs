@@ -1,3 +1,4 @@
+using Il2CppSteamworks;
 using MelonLoader;
 using UnityEngine;
 
@@ -17,6 +18,11 @@ namespace matechat
         public static MelonPreferences_Entry<string> SYSTEM_PROMPT;
         public static MelonPreferences_Entry<string> AI_NAME;
 
+        // new feature for openai compatible 
+        public static MelonPreferences_Entry<string> BASE_URL;
+
+        //
+
         public static MelonPreferences_Entry<int> CHAT_WINDOW_WIDTH;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_HEIGHT;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_X;
@@ -35,6 +41,10 @@ namespace matechat
                 "ENGINE_TYPE", "Cloudflare");  // Default to Cloudflare
             ACCOUNT_ID = category.CreateEntry("ACCOUNT_ID",
                                               "");  // Optional for OpenRouter/OpenAI
+
+            BASE_URL = category.CreateEntry("BASE_URL",
+                                              "");  // Optional for OpenAICompatible
+
             API_KEY =
                 category.CreateEntry("API_KEY", "");  // Mandatory for all engines
             MODEL_NAME = category.CreateEntry(
@@ -43,6 +53,7 @@ namespace matechat
                 "SYSTEM_PROMPT",
                 "You are a cheerful digital companion inspired by Hatsune Miku! Keep responses brief and energetic. Use musical notes (♪), kaomoji (◕‿◕), and cute text markers (✧) naturally. Express yourself in a sweet, J-pop idol style while being helpful and concise. Add '~' to soften statements occasionally. End responses with a musical note or kaomoji when fitting. Keep answers short and direct, but always maintain a cute and supportive tone!");
             AI_NAME = category.CreateEntry("AI_NAME", "Desktop Mate");
+
 
             CHAT_WINDOW_WIDTH = category.CreateEntry("CHAT_WINDOW_WIDTH", 400);
             CHAT_WINDOW_HEIGHT = category.CreateEntry("CHAT_WINDOW_HEIGHT", 500);
@@ -70,10 +81,11 @@ namespace matechat
             if (string.IsNullOrEmpty(ENGINE_TYPE.Value) ||
                 (ENGINE_TYPE.Value != "Cloudflare" &&
                  ENGINE_TYPE.Value != "OpenRouter" &&
-                 ENGINE_TYPE.Value != "OpenAI"))
+                 ENGINE_TYPE.Value != "OpenAI"     &&
+                ENGINE_TYPE.Value != "OpenAICompatible")) 
             {
                 LogError(
-                    $"Invalid ENGINE_TYPE: {ENGINE_TYPE.Value}. Supported: Cloudflare, OpenRouter, OpenAI.");
+                    $"Invalid ENGINE_TYPE: {ENGINE_TYPE.Value}. Supported: Cloudflare, OpenRouter, OpenAI, and OpenAICompatible");
             }
 
             // API_KEY Validation
@@ -84,6 +96,8 @@ namespace matechat
             if (ENGINE_TYPE.Value == "Cloudflare" &&
                 string.IsNullOrEmpty(ACCOUNT_ID.Value))
                 LogError("ACCOUNT_ID is required for Cloudflare!");
+            else if (ENGINE_TYPE.Value == "OpenAICompatible" && string.IsNullOrEmpty(BASE_URL.Value))
+                LogError("BASE_URL is required for OpenAICompatible.");
 
             // MODEL_NAME Validation
             if (string.IsNullOrEmpty(MODEL_NAME.Value))
@@ -92,9 +106,11 @@ namespace matechat
             // SYSTEM_PROMPT Validation
             if (string.IsNullOrEmpty(SYSTEM_PROMPT.Value))
                 LogError("SYSTEM_PROMPT is empty!");
-            else if (SYSTEM_PROMPT.Value.Length > 4096)
-                LogError(
-                    "SYSTEM_PROMPT exceeds the maximum length of 4096 characters!");
+            else 
+                if (ENGINE_TYPE.Value != "OpenAICompatible")
+                    if (SYSTEM_PROMPT.Value.Length > 4096)
+                        LogError(
+                        "SYSTEM_PROMPT exceeds the maximum length of 4096 characters!");
 
             // AI_NAME Validation
             if (string.IsNullOrEmpty(AI_NAME.Value))
@@ -130,7 +146,9 @@ namespace matechat
                                                                              // endpoint
                 case "OpenAI":
                     return "https://api.openai.com/v1/chat/completions";  // Fixed
-                                                                          // endpoint
+                                                                         // 
+                case "OpenAICompatible":
+                    return $"http://{BASE_URL.Value}/v1/chat/completions";  // customizable endpoint
                 default:
                     throw new System.Exception(
                         $"Unsupported ENGINE_TYPE: {ENGINE_TYPE.Value}");
@@ -152,6 +170,10 @@ namespace matechat
                 case "OpenAI":
                     MelonLogger.Msg(
                         "OpenAI Configuration: Provide your API_KEY. No ACCOUNT_ID is required. Use models like gpt-3.5-turbo or gpt-4.");
+                    break;
+                case "OpenAICompatible":
+                    MelonLogger.Msg(
+                        "OpenAICompatible Configuration: Provide your API_KEY and BASE_URL. No ACCOUNT_ID is required. Use models like meta-llama/Llama-3.1-8B-Instruct.");
                     break;
                 default:
                     MelonLogger.Error($"Unsupported ENGINE_TYPE: {ENGINE_TYPE.Value}");

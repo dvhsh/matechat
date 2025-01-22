@@ -408,6 +408,10 @@
 		<Compile Include="util\OpenRouterEngine.cs" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <PackageReference Include="Unity" Version="5.11.10" />
+	</ItemGroup>
+
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<!-- Copy the compiled DLL to the Mods folder -->
 		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\Mods&quot;" />
