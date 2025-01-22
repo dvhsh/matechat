@@ -18,55 +18,119 @@ namespace matechat.util
             _apiKey = apiKey;
             _endpoint = endpoint;
         }
-
         public async Task<string> SendRequestAsync(string prompt, string model = null, string systemPrompt = null)
         {
             model ??= "gpt-4"; // Default model if not specified
             systemPrompt ??= "You are an assistant."; // Default system prompt
 
-            MelonDebug.Msg("Message Prompt: " + systemPrompt);
+            // Start with the system message
+            var messages = new List<object>
+    {
+        new { role = "system", content = systemPrompt }
+    };
 
-            using var client = new HttpClient();
-            var payload = new
+            // Retrieve and reverse context messages
+            var contextMessages = Core.databaseManager.GetLastMessages(5);
+            contextMessages.Reverse(); // Reverse to chronological order (oldest to newest)
+
+            // Ensure the first non-system message is always a `user` message
+            string lastRole = "system"; // Track the last role added
+            foreach (var (role, message, _) in contextMessages)
             {
-                model,
-                messages = new[]
-                        {
-                    new { role = "system", content = systemPrompt },
-                    new { role = "user", content = prompt }
-              }
-            };
+                if (messages.Count == 1 && role != "user")
+                {
+                    // Skip any initial assistant messages until the first `user` message is added
+                    continue;
+                }
 
+                // Add messages while maintaining alternation
+                if (role == "user" && lastRole != "user")
+                {
+                    messages.Add(new { role, content = message });
+                    lastRole = role;
+                }
+                else if (role == "assistant" && lastRole != "assistant")
+                {
+                    messages.Add(new { role, content = message });
+                    lastRole = role;
+                }
+            }
+
+            // Ensure proper alternation: Add a placeholder assistant response if the last message was from `user`
+            if (lastRole == "user")
+            {
+                messages.Add(new { role = "assistant", content = "[Placeholder: Assistant did not respond]" });
+            }
+
+            // Add the user's current input as the final message
+            messages.Add(new { role = "user", content = prompt });
+
+            // Validate that the first non-system message is a `user` message
+            if (messages.Count > 1 && messages[1]?.GetType().GetProperty("role")?.GetValue(messages[1])?.ToString() != "user")
+            {
+                throw new InvalidOperationException("The first non-system message must be a user message.");
+            }
+
+            // Log the final payload for debugging
+            var payload = new { model, messages };
+            MelonLogger.Msg($"Payload: {JsonConvert.SerializeObject(payload, Formatting.Indented)}");
+
+            // Send the request
+            using var client = new HttpClient();
             var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {_apiKey}");
 
-            var response = await client.PostAsync(_endpoint, content);
-
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new HttpRequestException($"Request failed with status code {response.StatusCode}");
+                var response = await client.PostAsync(_endpoint, content);
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"Request failed with status code {response.StatusCode}: {errorContent}");
+                }
+
+                var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                dynamic result = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
+
+                if (result?.choices == null || result.choices.Count == 0)
+                {
+                    throw new InvalidOperationException("OpenAI API response does not contain valid choices.");
+                }
+
+                // Log the user and assistant messages to the database
+                Core.databaseManager.AddMessage("user", prompt);
+                string assistantResponse = result.choices[0].message.content;
+                Core.databaseManager.AddMessage("assistant", assistantResponse);
+
+                return assistantResponse;
             }
-
-            var result = JsonConvert.DeserializeObject<dynamic>(await response.Content.ReadAsStringAsync());
-            return result.choices[0].message.content;
+            catch (Exception ex)
+            {
+                // Log the user's message and the error
+                Core.databaseManager.AddMessage("user", prompt);
+                Core.databaseManager.AddMessage("assistant", "{ERROR}");
+                throw;
+            }
         }
-
 
         public async Task<bool> TestConnectionAsync(string model = null)
         {
             try
             {
-                model ??= Config.MODEL_NAME.Value;
-                MelonLogger.Msg($"Testing connection to OpenAI with model: {model} at {_endpoint}");
+                // Use the configured model or default to "gpt-4"
+                model ??= Config.MODEL_NAME?.Value ?? "gpt-4";
 
-                await SendRequestAsync("Test connection.", model);
-                MelonLogger.Msg("OpenAI TestConnection successful.");
+                // Test connection using the specified or configured model
+                var response = await SendRequestAsync("Test connection.", model);
+
+                if (string.IsNullOrEmpty(response))
+                {
+                    throw new InvalidOperationException("Test connection response is empty.");
+                }
+
                 return true;
-            }
-            catch (HttpRequestException ex)
-            {
-                MelonLogger.Error($"OpenAI TestConnection failed with HTTP error: {ex.Message}");
-                return false;
             }
             catch (Exception ex)
             {

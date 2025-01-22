@@ -2,6 +2,7 @@ using System.Collections;
 using MelonLoader;
 using UnityEngine;
 using matechat.sdk.Feature;
+using matechat.database;
 
 namespace matechat.feature
 {
@@ -205,8 +206,12 @@ namespace matechat.feature
             // Process the result
             if (task.Exception == null && task.IsCompletedSuccessfully)
             {
-                AppendToChatHistory($"{Config.AI_NAME.Value}: {task.Result}");
+                string assistantMessage = task.Result;
+
+                // Append the assistant's response to the chat history
+                AppendToChatHistory($"{Config.AI_NAME.Value}: {assistantMessage}");
             }
+
             else
             {
                 AppendToChatHistory($"Error: {(task.Exception?.Message ?? "Unknown error occurred.")}");
@@ -230,6 +235,8 @@ namespace matechat.feature
             responseText = string.Empty;
             inputText = string.Empty;
             scrollPosition = Vector2.zero;
+
+            Core.databaseManager.ClearMessages();
         }
 
         private void AppendToChatHistory(string message)

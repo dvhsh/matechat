@@ -7,6 +7,8 @@ using matechat.sdk.Feature;
 using matechat.feature;
 using matechat.ui;
 using matechat.util;
+using static matechat.database.DatabaseManager;
+using matechat.database;
 
 namespace matechat
 {
@@ -15,6 +17,8 @@ namespace matechat
         private static List<Feature> features;
         private MenuManager menuManager;
         private bool isInitialized;
+
+        public static DatabaseManager databaseManager;
 
         private static AIEngineManager aiEngineManager;
 
@@ -27,6 +31,8 @@ namespace matechat
 
                 // Initialize AI engines
                 InitializeAIEngines();
+
+                InitializeDBEngine();
 
                 // Initialize features
                 features = new List<Feature>
@@ -48,6 +54,11 @@ namespace matechat
             {
                 LoggerInstance.Error($"Failed to initialize: {ex}");
             }
+        }
+
+        private void InitializeDBEngine()
+        {
+            databaseManager = new DatabaseManager("UserData\\ChatLog.db");
         }
 
         private static void InitializeAIEngines()

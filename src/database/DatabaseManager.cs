@@ -9,14 +9,12 @@ namespace matechat.database
 
         public DatabaseManager(string databasePath)
         {
-            _connectionString = $"Data Source={databasePath};Version=3;";
-            if (!File.Exists(databasePath))
-            {
-                InitializeDatabase(databasePath);
-            }
+            _connectionString = $"Data Source={databasePath};";
+
+            InitializeDatabase();
         }
 
-        private void InitializeDatabase(string databasePath)
+        private void InitializeDatabase()
         {
             using (var connection = new SqliteConnection(_connectionString))
             {
