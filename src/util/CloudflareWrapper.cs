@@ -1,5 +1,9 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace matechat.util
 {
@@ -71,11 +75,20 @@ namespace matechat.util
             string apiToken,
             string model,
             string prompt,
+            string systemPrompt = null,
             string endpointTemplate = "https://api.cloudflare.com/client/v4/accounts/{0}/ai/run/@cf/meta/{1}"
         )
         {
             var endpoint = string.Format(endpointTemplate, accountId, model);
-            var payload = new { prompt };
+            var payload = new
+            {
+                model,
+                messages = new[]
+                {
+                    new { role = "system", content = systemPrompt ?? "You are an assistant." },
+                    new { role = "user", content = prompt }
+                }
+            };
 
             try
             {

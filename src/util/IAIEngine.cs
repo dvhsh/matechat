@@ -4,8 +4,7 @@ namespace matechat.util
 {
     public interface IAIEngine
     {
-        IEnumerator SendRequest(string userMessage, string systemPrompt,
-                                System.Action<string, string> callback);
-        IEnumerator TestEngine(System.Action<bool, string> callback);
+        Task<string> SendRequestAsync(string prompt, string model = null, string systemprompt = null);
+        Task<bool> TestConnectionAsync(string model = null);
     }
 }

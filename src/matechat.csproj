@@ -403,13 +403,12 @@
 		<Compile Include="ui\EmbeddedAssets.cs" />
 		<Compile Include="ui\MenuManager.cs" />
 		<Compile Include="ui\Pages.cs" />
-		<Compile Include="util\CloudflareUtil.cs" />
+		<Compile Include="util\AIEngineManager.cs" />
+		<Compile Include="util\CloudflareEngine.cs" />
 		<Compile Include="util\CloudflareWrapper.cs" />
 		<Compile Include="util\EngineHandle.cs" />
 		<Compile Include="util\IAIEngine.cs" />
-		<Compile Include="util\JsonUtil.cs" />
-		<Compile Include="util\OpenAIUtil.cs" />
-		<Compile Include="util\OpenRouterEngine.cs" />
+		<Compile Include="util\OpenAIEngine.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
