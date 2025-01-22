@@ -32,6 +32,8 @@ MateChat adds a cute chat interface to Desktop Mate, powered by Cloudflare's AI 
 
 Need help setting up your Cloudflare AI Worker? Follow this [quick guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)!
 
+## Other [AI Providers](OtherAPI.md)
+
 ## Example Config
 ```
 [MateChat]
