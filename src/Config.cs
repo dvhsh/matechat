@@ -15,12 +15,14 @@ namespace matechat
         public static MelonPreferences_Entry<string> MODEL_NAME;
         public static MelonPreferences_Entry<string> SYSTEM_PROMPT;
         public static MelonPreferences_Entry<string> AI_NAME;
+        public static MelonPreferences_Entry<string> NAME; // The Name that the AI Will know you by 
 
         public static MelonPreferences_Entry<int> CHAT_WINDOW_WIDTH;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_HEIGHT;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_X;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_Y;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_FONT_SIZE;
+        
 
         private static string lastUsedEngineType;
         private static string lastUsedSystemPrompt;
@@ -39,6 +41,7 @@ namespace matechat
                 "You are a cheerful digital companion inspired by Hatsune Miku! Keep responses brief and energetic. Use musical notes (♪), kaomoji (◕‿◕), and cute text markers (✧) naturally. Express yourself in a sweet, J-pop idol style while being helpful and concise. Add '~' to soften statements occasionally. End responses with a musical note or kaomoji when fitting. Keep answers short and direct, but always maintain a cute and supportive tone!"
             );
             AI_NAME = category.CreateEntry("AI_NAME", "Desktop Mate");
+            NAME = category.CreateEntry("NAME", "USER");
 
             CHAT_WINDOW_WIDTH = category.CreateEntry("CHAT_WINDOW_WIDTH", 400);
             CHAT_WINDOW_HEIGHT = category.CreateEntry("CHAT_WINDOW_HEIGHT", 500);

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -6,41 +6,65 @@
 		<RootNamespace>matechat</RootNamespace>
 		<LangVersion>latest</LangVersion>
 		<IsPackable>false</IsPackable>
-		<AssemblyVersion>1.0.0.0</AssemblyVersion>
-		<FileVersion>1.0.0.0</FileVersion>
-		<NeutralLanguage>en-US</NeutralLanguage>
+
+		<!-- Define version information -->
+		<AssemblyVersion>1.2.0</AssemblyVersion>
+		<FileVersion>1.2.0</FileVersion>
+		<InformationalVersion>1.2.0</InformationalVersion>
 		<AssemblyName>matechat</AssemblyName>
 		<OutputType>Library</OutputType>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 		<!-- Define possible game paths -->
 		<GamePathProgramFiles>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate</GamePathProgramFiles>
 		<GamePathSteamLibrary>C:\SteamLibrary\steamapps\common\Desktop Mate</GamePathSteamLibrary>
 	</PropertyGroup>
+
 	<PropertyGroup Condition="Exists('$(GamePathProgramFiles)')">
 		<StartAction>Program</StartAction>
 		<StartProgram>$(GamePathProgramFiles)\DesktopMate.exe</StartProgram>
 		<StartWorkingDirectory>$(GamePathProgramFiles)</StartWorkingDirectory>
 	</PropertyGroup>
+
 	<PropertyGroup Condition="!Exists('$(GamePathProgramFiles)') And Exists('$(GamePathSteamLibrary)')">
 		<StartAction>Program</StartAction>
 		<StartProgram>$(GamePathSteamLibrary)\DesktopMate.exe</StartProgram>
 		<StartWorkingDirectory>$(GamePathSteamLibrary)</StartWorkingDirectory>
 	</PropertyGroup>
+
+	<Target Name="InjectVersion" BeforeTargets="BeforeBuild">
+		<PropertyGroup>
+			<ConstantsFile>$(ProjectDir)Constants.cs</ConstantsFile>
+			<ConstantsBackupFile>$(ProjectDir)Constants.cs.bak</ConstantsBackupFile>
+		</PropertyGroup>
+
+		<!-- Restore the backup to ensure PLACEHOLDER_VERSION exists -->
+		<Exec Command="copy /Y &quot;$(ConstantsBackupFile)&quot; &quot;$(ConstantsFile)&quot;" />
+
+		<!-- Replace PLACEHOLDER_VERSION with the actual version -->
+		<Exec Command="powershell -Command &quot;(Get-Content '$(ConstantsFile)') -replace 'PLACEHOLDER_VERSION', '$(FileVersion)' | Set-Content '$(ConstantsFile)'&quot;" />
+	</Target>
+	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
 		<!-- Define mod folders -->
 		<PropertyGroup>
 			<ModPathProgramFiles>$(GamePathProgramFiles)\Mods</ModPathProgramFiles>
 			<ModPathSteamLibrary>$(GamePathSteamLibrary)\Mods</ModPathSteamLibrary>
 		</PropertyGroup>
+
 		<!-- Create Mods directory if it doesn't exist -->
 		<MakeDir Directories="$(ModPathProgramFiles)" Condition="Exists('$(GamePathProgramFiles)') And !Exists('$(ModPathProgramFiles)')" />
 		<MakeDir Directories="$(ModPathSteamLibrary)" Condition="Exists('$(GamePathSteamLibrary)') And !Exists('$(ModPathSteamLibrary)')" />
+
 		<!-- Copy to appropriate Mods folder -->
 		<Message Text="Copying to Program Files path..." Condition="Exists('$(GamePathProgramFiles)')" Importance="high" />
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModPathProgramFiles)" Condition="Exists('$(GamePathProgramFiles)')" />
+
 		<Message Text="Copying to SteamLibrary path..." Condition="Exists('$(GamePathSteamLibrary)')" Importance="high" />
 		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(ModPathSteamLibrary)" Condition="Exists('$(GamePathSteamLibrary)')" />
 	</Target>
+
 	<ItemGroup>
+		<PackageReference Include="ThisAssembly" Version="1.0.0" PrivateAssets="all" />
 		<Reference Include="Assembly-CSharp-firstpass">
 			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Assembly-CSharp-firstpass.dll</HintPath>
 		</Reference>
@@ -410,7 +434,9 @@
 		<Reference Include="Il2CppInterop.Common">
 			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
 		</Reference>
+
 	</ItemGroup>
+	
 	<ItemGroup>
 		<Reference Include="Assembly-CSharp-firstpass">
 			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\Assembly-CSharp-firstpass.dll</HintPath>
@@ -799,7 +825,9 @@
 		<Reference Include="Il2CppInterop.Common">
 			<HintPath>C:\SteamLibrary\steamapps\common\Desktop Mate\MelonLoader\net6\Il2CppInterop.Common.dll</HintPath>
 		</Reference>
+
 	</ItemGroup>
+
 	<PropertyGroup>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 		<GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
@@ -807,9 +835,11 @@
 		<AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
 		<AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
 	</PropertyGroup>
+
 	<ItemGroup>
 		<Compile Include="AssemblyInfo.cs" />
 		<Compile Include="Config.cs" />
+		<Compile Include="Constants.cs.bak" />
 		<Compile Include="Constants.cs" />
 		<Compile Include="Core.cs" />
 		<Compile Include="database\DatabaseManager.cs" />
@@ -824,26 +854,55 @@
 		<Compile Include="util\EngineHandle.cs" />
 		<Compile Include="util\IAIEngine.cs" />
 		<Compile Include="util\OpenAIEngine.cs" />
+			<Compile Remove="**/*.bak" />
 	</ItemGroup>
+
 	<ItemGroup>
-		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
+
 	<ItemGroup>
-		<None Update="UserLibs\e_sqlite3.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UserLibs\Microsoft.Data.Sqlite.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UserLibs\SQLitePCLRaw.batteries_v2.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UserLibs\SQLitePCLRaw.core.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
-		<None Update="UserLibs\SQLitePCLRaw.provider.e_sqlite3.dll">
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</None>
+	  <None Update="UserLibs\e_sqlite3.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="UserLibs\Microsoft.Data.Sqlite.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="UserLibs\SQLitePCLRaw.batteries_v2.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="UserLibs\SQLitePCLRaw.core.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="UserLibs\SQLitePCLRaw.provider.e_sqlite3.dll">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
+
+	<Target Name="PostBuild" AfterTargets="Build">
+		<!-- Rename matechat.dll to matechat.$(SanitizedVersion).dll -->
+		<Exec Command="if exist $(OutputPath)matechat.$(SanitizedVersion).dll del $(OutputPath)matechat.$(SanitizedVersion).dll" />
+		<Exec Command="move /Y $(OutputPath)matechat.dll $(OutputPath)matechat.$(SanitizedVersion).dll" />
+	</Target>
+
+	<Target Name="PostBuildCopy" AfterTargets="PostBuild">
+		<PropertyGroup>
+			<TargetModsFolder Condition="Exists('$(GamePathProgramFiles)')">$(GamePathProgramFiles)\Mods</TargetModsFolder>
+			<TargetModsFolder Condition="!Exists('$(GamePathProgramFiles)') And Exists('$(GamePathSteamLibrary)')">$(GamePathSteamLibrary)\Mods</TargetModsFolder>
+		</PropertyGroup>
+
+		<!-- Log paths for debugging -->
+		<Message Importance="High" Text="TargetModsFolder: $(TargetModsFolder)" />
+		<Message Importance="High" Text="OutputPath: $(OutputPath)" />
+
+		<!-- Ensure Mods folder exists -->
+		<Exec Condition="Exists('$(TargetModsFolder)') == false" Command="mkdir &quot;$(TargetModsFolder)&quot;" />
+
+		<!-- Delete any existing matechat files in the Mods folder, if they exist -->
+		<Exec Condition="Exists('$(TargetModsFolder)') And Exists('$(TargetModsFolder)\matechat*')" Command="del /Q &quot;$(TargetModsFolder)\matechat*&quot;" />
+
+		<!-- Copy the renamed file to the appropriate Mods folder -->
+		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$(SanitizedVersion).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
+	</Target>
 </Project>
