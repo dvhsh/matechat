@@ -19,16 +19,10 @@
 		<GamePathSteamLibrary>C:\SteamLibrary\steamapps\common\Desktop Mate</GamePathSteamLibrary>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="Exists('$(GamePathProgramFiles)')">
+	<PropertyGroup>
 		<StartAction>Program</StartAction>
-		<StartProgram>$(GamePathProgramFiles)\DesktopMate.exe</StartProgram>
-		<StartWorkingDirectory>$(GamePathProgramFiles)</StartWorkingDirectory>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="!Exists('$(GamePathProgramFiles)') And Exists('$(GamePathSteamLibrary)')">
-		<StartAction>Program</StartAction>
-		<StartProgram>$(GamePathSteamLibrary)\DesktopMate.exe</StartProgram>
-		<StartWorkingDirectory>$(GamePathSteamLibrary)</StartWorkingDirectory>
+		<StartProgram>C:\Windows\System32\cmd.exe</StartProgram>
+		<StartArguments>/C start steam://run/3301060</StartArguments>
 	</PropertyGroup>
 
 	<Target Name="InjectVersion" BeforeTargets="BeforeBuild">
