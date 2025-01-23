@@ -9,6 +9,11 @@ namespace matechat.ui
 {
     public static class EmbeddedAssets
     {
+        /// <summary>
+        /// Allows an Image Byte to Be Loaded into Unity Sprites
+        /// </summary>
+        /// <param name="img">Image Byte Array</param>
+        /// <returns></returns>
         public static Sprite LoadButtonSprite(byte[] img)
         {
             Texture2D texture = new Texture2D(2, 2, TextureFormat.RGBA32, false);

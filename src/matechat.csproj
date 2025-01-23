@@ -903,8 +903,8 @@
 
 	<Target Name="PostBuild" AfterTargets="Build">
 		<!-- Rename matechat.dll to matechat.$(SanitizedVersion).dll -->
-		<Exec Command="if exist $(OutputPath)matechat.$(SanitizedVersion).dll del $(OutputPath)matechat.$(SanitizedVersion).dll" />
-		<Exec Command="move /Y $(OutputPath)matechat.dll $(OutputPath)matechat.$(SanitizedVersion).dll" />
+		<Exec Command="if exist $(OutputPath)matechat.$(FileVersion).dll del $(OutputPath)matechat.$(FileVersion).dll" />
+		<Exec Command="move /Y $(OutputPath)matechat.dll $(OutputPath)matechat.$(FileVersion).dll" />
 	</Target>
 
 	<Target Name="PostBuildCopy" AfterTargets="PostBuild">
@@ -924,6 +924,6 @@
 		<Exec Condition="Exists('$(TargetModsFolder)') And Exists('$(TargetModsFolder)\matechat*')" Command="del /Q &quot;$(TargetModsFolder)\matechat*&quot;" />
 
 		<!-- Copy the renamed file to the appropriate Mods folder -->
-		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$(SanitizedVersion).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
+		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$($(FileVersion)).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
 	</Target>
 </Project>
