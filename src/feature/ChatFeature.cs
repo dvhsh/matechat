@@ -71,22 +71,29 @@ namespace matechat.feature
         {
             GUI.backgroundColor = ContentBackground;
             Rect contentRect = new Rect(
-                windowRect.x + Padding, windowRect.y + TitleBarHeight + Padding,
+                windowRect.x + Padding,
+                windowRect.y + TitleBarHeight + Padding,
                 windowRect.width - (Padding * 2),
                 windowRect.height - TitleBarHeight - InputHeight - (Padding * 3));
+
             GUI.Box(contentRect, string.Empty);
 
+            // Calculate content height
+            float contentHeight = textStyle.CalcHeight(new GUIContent(responseText),
+                contentRect.width - 10); // 10 for scrollbar width
+
+            // Only allow manual scrolling when not waiting for response
             if (contentRect.Contains(Event.current.mousePosition) && !isWaitingForResponse)
             {
                 float scroll = Input.mouseScrollDelta.y * 20f;
                 scrollPosition.y = Mathf.Clamp(scrollPosition.y - scroll, 0,
-                                Mathf.Max(0, responseText.Length - contentRect.height));
+                    Mathf.Max(0, contentHeight - contentRect.height));
             }
 
             GUI.BeginGroup(contentRect);
             GUI.Label(new Rect(5, -scrollPosition.y, contentRect.width - 10,
-                               Mathf.Max(contentRect.height, responseText.Length)),
-                      responseText, textStyle);
+                Mathf.Max(contentRect.height, contentHeight)),
+                responseText, textStyle);
             GUI.EndGroup();
         }
 
@@ -181,11 +188,10 @@ namespace matechat.feature
             AppendToChatHistory($"You: {inputText}");
             string userMessage = inputText;
             inputText = string.Empty;
-            AppendToChatHistory($"{Config.AI_NAME.Value}: typing...");
             isWaitingForResponse = true;
-
             MelonCoroutines.Start(SendMessageCoroutine(userMessage));
         }
+
 
         private IEnumerator SendMessageCoroutine(string userMessage)
         {
@@ -193,6 +199,10 @@ namespace matechat.feature
             string engineName = Config.ENGINE_TYPE.Value;
             string model = Config.MODEL_NAME.Value;
             string systemprompt = Config.SYSTEM_PROMPT.Value;
+
+            // Add typing message
+            string typingMessage = $"{Config.AI_NAME.Value}: typing...";
+            AppendToChatHistory(typingMessage);
 
             // Send the request asynchronously
             var task = aiManager.SendRequestAsync(userMessage, engineName, model, systemprompt);
@@ -203,15 +213,20 @@ namespace matechat.feature
                 yield return null;
             }
 
+            // Remove the typing message
+            responseText = responseText.Replace($"\n\n{typingMessage}", "");
+            if (responseText.EndsWith(typingMessage))
+            {
+                responseText = responseText.Substring(0, responseText.Length - typingMessage.Length);
+            }
+
             // Process the result
             if (task.Exception == null && task.IsCompletedSuccessfully)
             {
                 string assistantMessage = task.Result;
-
                 // Append the assistant's response to the chat history
                 AppendToChatHistory($"{Config.AI_NAME.Value}: {assistantMessage}");
             }
-
             else
             {
                 AppendToChatHistory($"Error: {(task.Exception?.Message ?? "Unknown error occurred.")}");
@@ -245,6 +260,11 @@ namespace matechat.feature
                 responseText += "\n\n";
 
             responseText += message;
+
+            // Auto-scroll to bottom
+            float contentHeight = textStyle.CalcHeight(new GUIContent(responseText),
+                windowRect.width - (Padding * 2) - 10); 
+            scrollPosition.y = Mathf.Max(0, contentHeight);
         }
 
         public void UpdateSettings()
