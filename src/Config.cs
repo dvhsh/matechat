@@ -15,12 +15,14 @@ namespace matechat
         public static MelonPreferences_Entry<string> MODEL_NAME;
         public static MelonPreferences_Entry<string> SYSTEM_PROMPT;
         public static MelonPreferences_Entry<string> AI_NAME;
+        public static MelonPreferences_Entry<string> NAME; // The Name that the AI Will know you by 
 
         public static MelonPreferences_Entry<int> CHAT_WINDOW_WIDTH;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_HEIGHT;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_X;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_Y;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_FONT_SIZE;
+        
 
         private static string lastUsedEngineType;
         private static string lastUsedSystemPrompt;
