@@ -200,6 +200,8 @@ namespace matechat.feature
             string model = Config.MODEL_NAME.Value;
             string systemprompt = Config.SYSTEM_PROMPT.Value;
 
+            systemprompt += string.Format(" You are Responding to {0}, and your name is {1}", Config.NAME, Config.AI_NAME);
+
             // Add typing message
             string typingMessage = $"{Config.AI_NAME.Value}: typing...";
             AppendToChatHistory(typingMessage);

@@ -39,11 +39,14 @@ namespace matechat.util
             model ??= _model; // Use default model if none specified
             string endpoint = $"https://api.cloudflare.com/client/v4/accounts/{_accountId}/ai/run/@cf/meta/{model}";
 
+
+
+
             // Start with the system message
             var payloadMessages = new List<object>
-    {
-        new { role = "system", content = systemPrompt ?? "You are a helpful assistant." }
-    };
+            {
+                new { role = "system", content = systemPrompt ?? "You are a helpful assistant." }
+            };
 
             // Retrieve and reverse context messages
             var contextMessages = Core.databaseManager.GetLastMessages(5);
