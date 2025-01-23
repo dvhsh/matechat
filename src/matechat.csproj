@@ -8,9 +8,9 @@
 		<IsPackable>false</IsPackable>
 
 		<!-- Define version information -->
-		<AssemblyVersion>1.2.0</AssemblyVersion>
-		<FileVersion>1.2.0</FileVersion>
-		<InformationalVersion>1.2.0</InformationalVersion>
+		<AssemblyVersion>1.2.1</AssemblyVersion>
+		<FileVersion>1.2.1</FileVersion>
+		<InformationalVersion>1.2.1</InformationalVersion>
 		<AssemblyName>matechat</AssemblyName>
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -838,7 +838,18 @@
 		<Compile Include="Core.cs" />
 		<Compile Include="database\DatabaseManager.cs" />
 		<Compile Include="feature\ChatFeature.cs" />
+		<Compile Include="Resource1.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Resource1.resx</DependentUpon>
+		</Compile>
 		<Compile Include="sdk\Feature.cs" />
+		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid-Miku.png" />
+		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid.png" />
+		<EmbeddedResource Include="ui\assets\OpenConfig-Vocaloid-Miku.png" />
+		<EmbeddedResource Include="ui\assets\OpenConfig-Vocaloid.png" />
+		<EmbeddedResource Include="ui\assets\ReloadConfig-Vocaloid-Miku.png" />
+		<EmbeddedResource Include="ui\assets\ReloadConfig-Vocaloid.png" />
 		<Compile Include="ui\EmbeddedAssets.cs" />
 		<Compile Include="ui\MenuManager.cs" />
 		<Compile Include="ui\Pages.cs" />
@@ -852,8 +863,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="ui\assets\MateChat-Vocaloid-Miku.png" />
+	  <None Remove="ui\assets\MateChat-Vocaloid.png" />
+	  <None Remove="ui\assets\OpenConfig-Vocaloid-Miku.png" />
+	  <None Remove="ui\assets\OpenConfig-Vocaloid.png" />
+	  <None Remove="ui\assets\ReloadConfig-Vocaloid-Miku.png" />
+	  <None Remove="ui\assets\ReloadConfig-Vocaloid.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resource1.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
