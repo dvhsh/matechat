@@ -32,6 +32,8 @@ namespace matechat
                 // Initialize AI engines
                 InitializeAIEngines();
 
+
+                //Initialize the Database Engine
                 InitializeDBEngine();
 
                 // Initialize features

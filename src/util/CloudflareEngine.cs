@@ -13,6 +13,12 @@ namespace matechat.util
         private readonly string _accountId;
         private readonly string _model;
 
+        /// <summary>
+        /// Initilialize the Engine to Use Cloudflare
+        /// </summary>
+        /// <param name="apiToken">Provided Token from Cloud Flare</param>
+        /// <param name="accountId">Account ID from Cloud Flare</param>
+        /// <param name="model">Selected model from the endpoint</param>
         public CloudflareEngine(string apiToken, string accountId, string model)
         {
             _apiToken = apiToken;
@@ -20,6 +26,14 @@ namespace matechat.util
             _model = model;
         }
 
+        /// <summary>
+        /// Send request to Endpoint
+        /// </summary>
+        /// <param name="prompt">User Input</param>
+        /// <param name="model">Selected Model</param>
+        /// <param name="systemPrompt">System Prompt</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public async Task<string> SendRequestAsync(string prompt, string model = null, string systemPrompt = null)
         {
             model ??= _model; // Use default model if none specified

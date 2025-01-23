@@ -13,11 +13,26 @@ namespace matechat.util
         private readonly string _apiKey;
         private readonly string _endpoint;
 
+        /// <summary>
+        /// Uses a OpenAI/OpenRouter Endpoint
+        /// </summary>
+        /// <param name="apiKey">The Key provided by the User</param>
+        /// <param name="endpoint">Right now the Endpoints are Hardcoded</param>
+
         public OpenAIEngine(string apiKey, string endpoint)
         {
             _apiKey = apiKey;
             _endpoint = endpoint;
         }
+
+        /// <summary>
+        /// Sends A Request to the AI Endpoint
+        /// </summary>
+        /// <param name="prompt">User Input</param>
+        /// <param name="model">Selected Model</param>
+        /// <param name="systemPrompt">The System Prompt</param>
+        /// <returns></returns>
+        /// <exception cref="InvalidOperationException"></exception>
         public async Task<string> SendRequestAsync(string prompt, string model = null, string systemPrompt = null)
         {
             model ??= "gpt-4"; // Default model if not specified
@@ -25,9 +40,9 @@ namespace matechat.util
 
             // Start with the system message
             var messages = new List<object>
-    {
-        new { role = "system", content = systemPrompt }
-    };
+            {
+                new { role = "system", content = systemPrompt }
+            };
 
             // Retrieve and reverse context messages
             var contextMessages = Core.databaseManager.GetLastMessages(5);
@@ -115,6 +130,11 @@ namespace matechat.util
             }
         }
 
+        /// <summary>
+        /// Test the endpont and Model to make sure it works
+        /// </summary>
+        /// <param name="model">The User Selected Model</param>
+        /// <returns>If test Returns Good or not</returns>
         public async Task<bool> TestConnectionAsync(string model = null)
         {
             try
