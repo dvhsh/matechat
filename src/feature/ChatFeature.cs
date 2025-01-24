@@ -216,6 +216,18 @@ namespace matechat.feature
                     if (!string.IsNullOrEmpty(response))
                     {
                         AppendToChatHistory($"{Config.AI_NAME.Value}: {response}");
+
+                        // TTS or Audio feature execute
+                        if (Config.ENABLE_TTS.Value || Config.ENABLE_AUDIO_MODEL.Value)
+                        {
+                            MelonLogger.Msg("[Audio] Sending LLM response to AudioManager...");
+                            MelonCoroutines.Start(AudioManager.PlayAudio(response, (path, err) => {
+                                if (err != null)
+                                {
+                                    MelonLogger.Error($"[Audio] Error playing audio: {err}");
+                                }
+                            }));
+                        }
                     }
                     else
                     {

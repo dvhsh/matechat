@@ -372,6 +372,9 @@
 		<Reference Include="UnityEngine.XRModule">
 			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.XRModule.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.AudioModule">
+			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AudioModule.dll</HintPath>
+		</Reference>
 		<Reference Include="MelonLoader">
 			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\net6\MelonLoader.dll</HintPath>
 		</Reference>
@@ -401,15 +404,22 @@
 		<Compile Include="ui\EmbeddedAssets.cs" />
 		<Compile Include="ui\MenuManager.cs" />
 		<Compile Include="ui\Pages.cs" />
+		<Compile Include="util\audio\AudioManager.cs" />
+		<Compile Include="util\audio\AudioModelEngine.cs" />
+		<Compile Include="util\audio\IAudioProcessor.cs" />
+		<Compile Include="util\audio\TTSEngine.cs" />
+		<Compile Include="util\audio\WAV.cs" />
 		<Compile Include="util\CloudflareUtil.cs" />
 		<Compile Include="util\IAIEngine.cs" />
+		<Compile Include="util\JsonRequestBuilder.cs" />
 		<Compile Include="util\JsonUtil.cs" />
 		<Compile Include="util\OpenAIUtil.cs" />
 		<Compile Include="util\OpenRouterEngine.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="Unity" Version="5.11.10" />
+		<PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

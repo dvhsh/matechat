@@ -21,7 +21,24 @@ namespace matechat
         // new feature for openai compatible 
         public static MelonPreferences_Entry<string> BASE_URL;
 
-        //
+        // Audio Features
+        public static MelonPreferences_Entry<bool> ENABLE_TTS;
+        public static MelonPreferences_Entry<string> TTS_ENGINE;
+        public static MelonPreferences_Entry<string> TTS_API_URL;
+
+        public static MelonPreferences_Entry<string> TTS_TEXT_LANG;
+        public static MelonPreferences_Entry<string> TTS_REF_AUDIO_PATH;
+        public static MelonPreferences_Entry<string> TTS_PROMPT_TEXT;
+        public static MelonPreferences_Entry<string> TTS_PROMPT_LANG;
+        public static MelonPreferences_Entry<string> TTS_TEXT_SPLIT_METHOD;
+        public static MelonPreferences_Entry<int> TTS_BATCH_SIZE;
+        public static MelonPreferences_Entry<string> TTS_MEDIA_TYPE;
+        public static MelonPreferences_Entry<bool> TTS_STREAMING_MODE;
+
+        public static MelonPreferences_Entry<bool> ENABLE_AUDIO_MODEL;
+        public static MelonPreferences_Entry<string> AUDIO_MODEL_API_URL;
+        public static MelonPreferences_Entry<string> AUDIO_MODEL_ENGINE;
+
 
         public static MelonPreferences_Entry<int> CHAT_WINDOW_WIDTH;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_HEIGHT;
@@ -54,6 +71,22 @@ namespace matechat
                 "You are a cheerful digital companion inspired by Hatsune Miku! Keep responses brief and energetic. Use musical notes (♪), kaomoji (◕‿◕), and cute text markers (✧) naturally. Express yourself in a sweet, J-pop idol style while being helpful and concise. Add '~' to soften statements occasionally. End responses with a musical note or kaomoji when fitting. Keep answers short and direct, but always maintain a cute and supportive tone!");
             AI_NAME = category.CreateEntry("AI_NAME", "Desktop Mate");
 
+            ENABLE_TTS = category.CreateEntry("ENABLE_TTS", false);
+            TTS_ENGINE = category.CreateEntry("TTS_ENGINE", "GPT-SoVITS");
+            TTS_API_URL = category.CreateEntry("TTS_API_URL", "http://localhost:9880/tts");
+
+            TTS_TEXT_LANG = category.CreateEntry("TTS_TEXT_LANG", "ja");
+            TTS_REF_AUDIO_PATH = category.CreateEntry("TTS_REF_AUDIO_PATH", "reference.wav");
+            TTS_PROMPT_TEXT = category.CreateEntry("TTS_PROMPT_TEXT", "1杯の珈琲と、 至福の時をアナタに…。");
+            TTS_PROMPT_LANG = category.CreateEntry("TTS_PROMPT_LANG", "ja");
+            TTS_TEXT_SPLIT_METHOD = category.CreateEntry("TTS_TEXT_SPLIT_METHOD", "cut5");
+            TTS_BATCH_SIZE = category.CreateEntry("TTS_BATCH_SIZE", 1);
+            TTS_MEDIA_TYPE = category.CreateEntry("TTS_MEDIA_TYPE", "wav");
+            TTS_STREAMING_MODE = category.CreateEntry("TTS_STREAMING_MODE", false);
+
+            // for 'omni' model, such as gpt-4o, gemini
+            ENABLE_AUDIO_MODEL = category.CreateEntry("ENABLE_AUDIO_MODEL", false);
+            //AUDIO_MODEL_API_URL = category.CreateEntry("AUDIO", "http://localhost:8000/v1/audio-model");
 
             CHAT_WINDOW_WIDTH = category.CreateEntry("CHAT_WINDOW_WIDTH", 400);
             CHAT_WINDOW_HEIGHT = category.CreateEntry("CHAT_WINDOW_HEIGHT", 500);
@@ -148,7 +181,7 @@ namespace matechat
                     return "https://api.openai.com/v1/chat/completions";  // Fixed
                                                                          // 
                 case "OpenAICompatible":
-                    return $"http://{BASE_URL.Value}/v1/chat/completions";  // customizable endpoint
+                    return $"{BASE_URL.Value}/v1/chat/completions";  // customizable endpoint
                 default:
                     throw new System.Exception(
                         $"Unsupported ENGINE_TYPE: {ENGINE_TYPE.Value}");
@@ -212,6 +245,8 @@ namespace matechat
                           $"Failed to reset engine/system prompt: {error}");
                             }
                         }));
+
+                    Core.ReloadAudioEngine();
                 }
 
                 Core.GetChatFeature()?.UpdateSettings();
@@ -229,6 +264,18 @@ namespace matechat
                             MelonLogger.Error($"AI engine test failed: {error}");
                         }
                     }));
+
+                //MelonCoroutines.Start(
+                //    Core.GetAudioEngine().TestEngine((success, error) => {
+                //        if (success)
+                //        {
+                //            MelonLogger.Msg("AI engine test successful!");
+                //        }
+                //        else
+                //        {
+                //            MelonLogger.Error($"AI engine test failed: {error}");
+                //        }
+                //    }));
             }
             else
             {

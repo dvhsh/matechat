@@ -17,6 +17,8 @@ namespace matechat
         private bool isInitialized;
 
         private static IAIEngine aiEngine;
+        private static IAudioProcessor audioEngine;
+
 
         public override void OnApplicationStart()
         {
@@ -27,6 +29,10 @@ namespace matechat
 
                 // Initialize the AI engine based on the config
                 InitializeAIEngine();
+
+                // initialize the Audio engine based on the config
+                InitializeAudioEngine();
+
 
                 // Initialize features
                 features = new List<Feature>();
@@ -87,6 +93,54 @@ namespace matechat
             }
         }
 
+        private static void InitializeAudioEngine()
+        {
+            try
+            {
+                if (Config.ENABLE_TTS.Value)
+                {
+                    switch (Config.TTS_ENGINE.Value)
+                    {
+                        case "GPT-SoVITS":
+                            audioEngine = new TTSEngine();
+                            MelonLogger.Msg("Using GPT-SoVITS for TTS.");
+                            break;
+
+                        default:
+                            MelonLogger.Error($"Unsupported TTS engine type: {Config.TTS_ENGINE.Value}");
+                            throw new System.Exception("Invalid TTS engine configuration.");
+                    }
+                }
+                else if (Config.ENABLE_AUDIO_MODEL.Value)
+                {
+                    audioEngine = new AudioModelEngine();
+                    MelonLogger.Msg("Using Audio Model for sound processing.");
+                }
+                else
+                {
+                    MelonLogger.Msg("No Audio Engine enabled.");
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to initialize Audio Engine: {ex.Message}");
+                throw;
+            }
+        }
+        public static void ReloadAudioEngine()
+        {
+            try
+            {
+                InitializeAudioEngine();
+                MelonLogger.Msg("Audio engine reloaded successfully.");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to reload Audio engine: {ex.Message}");
+            }
+        }
+
+
         public static void ReloadAIEngine()
         {
             try
@@ -117,6 +171,15 @@ namespace matechat
                 throw new System.Exception("AI engine is not initialized.");
             }
             return aiEngine;
+        }
+
+        public static IAudioProcessor GetAudioEngine()
+        {
+            if (audioEngine == null)
+            {
+                throw new System.Exception("Audio engine is not initialized.");
+            }
+            return audioEngine;
         }
 
         public override void OnLateUpdate()
