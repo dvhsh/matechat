@@ -2,7 +2,7 @@ using System.Collections;
 using MelonLoader;
 using UnityEngine;
 using matechat.sdk.Feature;
-using matechat.util;
+using matechat.database;
 
 namespace matechat.feature
 {
@@ -15,13 +15,10 @@ namespace matechat.feature
         private Vector2 scrollPosition;
         private GUIStyle textStyle;
         private Rect windowRect;
-        private IAIEngine aiEngine;
-        private static readonly Color MikuTeal =
-            new Color(0.07f, 0.82f, 0.82f, 0.95f);
-        private static readonly Color DarkTeal =
-            new Color(0.05f, 0.4f, 0.4f, 0.95f);
-        private static readonly Color WindowBackground =
-            new Color(0.1f, 0.1f, 0.1f, 0.95f);
+
+        private static readonly Color MikuTeal = new Color(0.07f, 0.82f, 0.82f, 0.95f);
+        private static readonly Color DarkTeal = new Color(0.05f, 0.4f, 0.4f, 0.95f);
+        private static readonly Color WindowBackground = new Color(0.1f, 0.1f, 0.1f, 0.95f);
         private static readonly Color InputBackground = new Color(1, 1, 1, 0.15f);
         private static readonly Color ContentBackground = new Color(1, 1, 1, 0.1f);
         private const int TitleBarHeight = 30;
@@ -39,9 +36,6 @@ namespace matechat.feature
             };
             UpdateWindowRect();
             UpdateSettings();
-
-            // Dynamically assign the AI engine based on configuration
-            aiEngine = Core.GetAIEngine();
         }
 
         public void UpdateWindowRect()
@@ -72,48 +66,42 @@ namespace matechat.feature
             DrawInputArea();
             GUI.backgroundColor = originalBgColor;
         }
+
         private void DrawChatContent()
         {
             GUI.backgroundColor = ContentBackground;
             Rect contentRect = new Rect(
-                windowRect.x + Padding, windowRect.y + TitleBarHeight + Padding,
+                windowRect.x + Padding,
+                windowRect.y + TitleBarHeight + Padding,
                 windowRect.width - (Padding * 2),
                 windowRect.height - TitleBarHeight - InputHeight - (Padding * 3));
+
             GUI.Box(contentRect, string.Empty);
 
-            // Allow manual scrolling when not sending/receiving messages
-            if (contentRect.Contains(Event.current.mousePosition) &&
-                !isWaitingForResponse)
+            // Calculate content height
+            float contentHeight = textStyle.CalcHeight(new GUIContent(responseText),
+                contentRect.width - 10); // 10 for scrollbar width
+
+            // Only allow manual scrolling when not waiting for response
+            if (contentRect.Contains(Event.current.mousePosition) && !isWaitingForResponse)
             {
                 float scroll = Input.mouseScrollDelta.y * 20f;
-                scrollPosition.y =
-                    Mathf.Clamp(scrollPosition.y - scroll, 0,
-                                Mathf.Max(0, responseText.Length - contentRect.height));
+                scrollPosition.y = Mathf.Clamp(scrollPosition.y - scroll, 0,
+                    Mathf.Max(0, contentHeight - contentRect.height));
             }
 
             GUI.BeginGroup(contentRect);
             GUI.Label(new Rect(5, -scrollPosition.y, contentRect.width - 10,
-                               Mathf.Max(contentRect.height, responseText.Length)),
-                      responseText, textStyle);
+                Mathf.Max(contentRect.height, contentHeight)),
+                responseText, textStyle);
             GUI.EndGroup();
-        }
-
-        private void LimitChatHistory()
-        {
-            string[] lines = responseText.Split('\n');
-            if (lines.Length > MaxChatHistory)
-            {
-                responseText =
-                    string.Join("\n", lines.Skip(lines.Length - MaxChatHistory));
-            }
         }
 
         private void DrawShadow()
         {
             GUI.backgroundColor = Color.black;
             GUI.Box(new Rect(windowRect.x + 2, windowRect.y + 2, windowRect.width,
-                             windowRect.height),
-                    string.Empty);
+                             windowRect.height), string.Empty);
         }
 
         private void DrawMainWindow()
@@ -129,8 +117,7 @@ namespace matechat.feature
             GUI.backgroundColor = MikuTeal;
             GUI.Box(titleBarRect, string.Empty);
             GUI.Label(new Rect(windowRect.x + 60, windowRect.y + 5,
-                               windowRect.width - 120, 20),
-                      "✧ Mate Chat ♪ ✧");
+                               windowRect.width - 120, 20), "✧ Mate Chat ♪ ✧");
 
             Rect clearButtonRect = new Rect(windowRect.x + windowRect.width - 55,
                                             windowRect.y + 5, 50, 20);
@@ -148,10 +135,9 @@ namespace matechat.feature
         private void DrawInputArea()
         {
             GUI.backgroundColor = InputBackground;
-            Rect inputRect =
-                new Rect(windowRect.x + Padding,
-                         windowRect.y + windowRect.height - InputHeight - Padding,
-                         windowRect.width - 90, InputHeight);
+            Rect inputRect = new Rect(windowRect.x + Padding,
+                                      windowRect.y + windowRect.height - InputHeight - Padding,
+                                      windowRect.width - 90, InputHeight);
             GUI.Box(inputRect, string.Empty);
             GUI.Label(inputRect, inputText, textStyle);
             HandleInputEvents();
@@ -188,8 +174,7 @@ namespace matechat.feature
             GUI.backgroundColor = MikuTeal;
             Rect sendButtonRect = new Rect(inputRect.x + inputRect.width + 10,
                                            inputRect.y, 60, InputHeight);
-            if (GUI.Button(sendButtonRect, "♪ Send") &&
-                !string.IsNullOrEmpty(inputText))
+            if (GUI.Button(sendButtonRect, "♪ Send") && !string.IsNullOrEmpty(inputText))
             {
                 SendMessage();
             }
@@ -203,47 +188,72 @@ namespace matechat.feature
             AppendToChatHistory($"You: {inputText}");
             string userMessage = inputText;
             inputText = string.Empty;
-            AppendToChatHistory(Config.AI_NAME.Value + ": typing...");
             isWaitingForResponse = true;
-
             MelonCoroutines.Start(SendMessageCoroutine(userMessage));
         }
 
+
         private IEnumerator SendMessageCoroutine(string userMessage)
         {
-            yield return aiEngine.SendRequest(
-                userMessage, Config.SYSTEM_PROMPT.Value, (response, error) => {
-                    if (!string.IsNullOrEmpty(response))
-                    {
-                        AppendToChatHistory($"{Config.AI_NAME.Value}: {response}");
+            var aiManager = Core.GetAIEngineManager();
+            string engineName = Config.ENGINE_TYPE.Value;
+            string model = Config.MODEL_NAME.Value;
+            string systemprompt = Config.SYSTEM_PROMPT.Value;
 
-                        // TTS or Audio feature execute
-                        if (Config.ENABLE_TTS.Value || Config.ENABLE_AUDIO_MODEL.Value)
-                        {
-                            MelonLogger.Msg("[Audio] Sending LLM response to AudioManager...");
-                            MelonCoroutines.Start(AudioManager.PlayAudio(response, (path, err) => {
-                                if (err != null)
-                                {
-                                    MelonLogger.Error($"[Audio] Error playing audio: {err}");
-                                }
-                            }));
-                        }
-                    }
-                    else
-                    {
-                        AppendToChatHistory($"Error: {error}");
-                    }
-                });
+            systemprompt += string.Format(" You are Responding to {0}, and your name is {1}", Config.NAME.Value, Config.AI_NAME.Value);
 
+            // Add typing message
+            string typingMessage = $"{Config.AI_NAME.Value}: typing...";
+            AppendToChatHistory(typingMessage);
+
+            // Send the request asynchronously
+            var task = aiManager.SendRequestAsync(userMessage, engineName, model, systemprompt);
+
+            // Wait for the task to complete
+            while (!task.IsCompleted)
+            {
+                yield return null;
+            }
+
+            // Remove the typing message
+            responseText = responseText.Replace($"\n\n{typingMessage}", "");
+            if (responseText.EndsWith(typingMessage))
+            {
+                responseText = responseText.Substring(0, responseText.Length - typingMessage.Length);
+            }
+
+            // Process the result
+            if (task.Exception == null && task.IsCompletedSuccessfully)
+            {
+                string assistantMessage = task.Result;
+                // Append the assistant's response to the chat history
+                AppendToChatHistory($"{Config.AI_NAME.Value}: {assistantMessage}");
+            }
+            else
+            {
+                AppendToChatHistory($"Error: {(task.Exception?.Message ?? "Unknown error occurred.")}");
+            }
+
+            // Reset the waiting state
             isWaitingForResponse = false;
             LimitChatHistory();
         }
 
+        private void LimitChatHistory()
+        {
+            string[] lines = responseText.Split('\n');
+            if (lines.Length > MaxChatHistory)
+            {
+                responseText = string.Join("\n", lines.Skip(lines.Length - MaxChatHistory));
+            }
+        }
         private void ClearChat()
         {
             responseText = string.Empty;
             inputText = string.Empty;
             scrollPosition = Vector2.zero;
+
+            Core.databaseManager.ClearMessages();
         }
 
         private void AppendToChatHistory(string message)
@@ -252,6 +262,11 @@ namespace matechat.feature
                 responseText += "\n\n";
 
             responseText += message;
+
+            // Auto-scroll to bottom
+            float contentHeight = textStyle.CalcHeight(new GUIContent(responseText),
+                windowRect.width - (Padding * 2) - 10); 
+            scrollPosition.y = Mathf.Max(0, contentHeight);
         }
 
         public void UpdateSettings()

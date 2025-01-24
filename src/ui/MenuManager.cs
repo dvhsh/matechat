@@ -66,8 +66,7 @@ namespace matechat.ui
                         Image buttonImage = buttonObj.GetComponent<Image>();
                         if (buttonImage != null)
                         {
-                            buttonImage.sprite = EmbeddedAssets.LoadButtonSprite(
-                                EmbeddedAssets.SettingsButton);
+                            buttonImage.sprite = EmbeddedAssets.LoadButtonSprite(Resource1.MateChat_Vocaloid);
                             buttonImage.type = Image.Type.Simple;
                             buttonImage.preserveAspect = true;
                         }

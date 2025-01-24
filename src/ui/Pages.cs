@@ -137,7 +137,9 @@ namespace matechat.ui.Pages
         {
             var button =
                 CreateSettingsButton(template, "ConfigButton",
-                                     EmbeddedAssets.EditButton, new Vector2(0, 0));
+                                     null, new Vector2(0, 0));
+
+            button.image.sprite = EmbeddedAssets.LoadButtonSprite(Resource1.OpenConfig_Vocaloid);
             button.onClick.AddListener((UnityEngine.Events.UnityAction)delegate {
                 string configPath =
                     Path.Combine(MelonEnvironment.UserDataDirectory, "MateChat.cfg");
@@ -161,8 +163,8 @@ namespace matechat.ui.Pages
         private void CreateReloadButton(Button template)
         {
             var button = CreateSettingsButton(template, "ReloadButton",
-                                              EmbeddedAssets.ReloadButton,
-                                              new Vector2(0, -60));
+                                              null,new Vector2(0, -60));
+            button.image.sprite = EmbeddedAssets.LoadButtonSprite(Resource1.ReloadConfig_Vocaloid);
             button.onClick.AddListener(
                 (UnityEngine.Events.UnityAction)delegate { Config.ReloadConfig(); });
         }
