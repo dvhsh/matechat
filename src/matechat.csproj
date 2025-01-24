@@ -8,9 +8,9 @@
 		<IsPackable>false</IsPackable>
 
 		<!-- Define version information -->
-		<AssemblyVersion>1.2.0</AssemblyVersion>
-		<FileVersion>1.2.0</FileVersion>
-		<InformationalVersion>1.2.0</InformationalVersion>
+		<AssemblyVersion>1.2.1</AssemblyVersion>
+		<FileVersion>1.2.1</FileVersion>
+		<InformationalVersion>1.2.1</InformationalVersion>
 		<AssemblyName>matechat</AssemblyName>
 		<OutputType>Library</OutputType>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -19,16 +19,10 @@
 		<GamePathSteamLibrary>C:\SteamLibrary\steamapps\common\Desktop Mate</GamePathSteamLibrary>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="Exists('$(GamePathProgramFiles)')">
+	<PropertyGroup>
 		<StartAction>Program</StartAction>
-		<StartProgram>$(GamePathProgramFiles)\DesktopMate.exe</StartProgram>
-		<StartWorkingDirectory>$(GamePathProgramFiles)</StartWorkingDirectory>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="!Exists('$(GamePathProgramFiles)') And Exists('$(GamePathSteamLibrary)')">
-		<StartAction>Program</StartAction>
-		<StartProgram>$(GamePathSteamLibrary)\DesktopMate.exe</StartProgram>
-		<StartWorkingDirectory>$(GamePathSteamLibrary)</StartWorkingDirectory>
+		<StartProgram>C:\Windows\System32\cmd.exe</StartProgram>
+		<StartArguments>/C start steam://run/3301060</StartArguments>
 	</PropertyGroup>
 
 	<Target Name="InjectVersion" BeforeTargets="BeforeBuild">
@@ -844,7 +838,18 @@
 		<Compile Include="Core.cs" />
 		<Compile Include="database\DatabaseManager.cs" />
 		<Compile Include="feature\ChatFeature.cs" />
+		<Compile Include="Resource1.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Resource1.resx</DependentUpon>
+		</Compile>
 		<Compile Include="sdk\Feature.cs" />
+		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid-Miku.png" />
+		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid.png" />
+		<EmbeddedResource Include="ui\assets\OpenConfig-Vocaloid-Miku.png" />
+		<EmbeddedResource Include="ui\assets\OpenConfig-Vocaloid.png" />
+		<EmbeddedResource Include="ui\assets\ReloadConfig-Vocaloid-Miku.png" />
+		<EmbeddedResource Include="ui\assets\ReloadConfig-Vocaloid.png" />
 		<Compile Include="ui\EmbeddedAssets.cs" />
 		<Compile Include="ui\MenuManager.cs" />
 		<Compile Include="ui\Pages.cs" />
@@ -858,8 +863,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <None Remove="ui\assets\MateChat-Vocaloid-Miku.png" />
+	  <None Remove="ui\assets\MateChat-Vocaloid.png" />
+	  <None Remove="ui\assets\OpenConfig-Vocaloid-Miku.png" />
+	  <None Remove="ui\assets\OpenConfig-Vocaloid.png" />
+	  <None Remove="ui\assets\ReloadConfig-Vocaloid-Miku.png" />
+	  <None Remove="ui\assets\ReloadConfig-Vocaloid.png" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.1" />
 	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Update="Resource1.resx">
+	    <Generator>ResXFileCodeGenerator</Generator>
+	    <LastGenOutput>Resource1.Designer.cs</LastGenOutput>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -882,8 +903,8 @@
 
 	<Target Name="PostBuild" AfterTargets="Build">
 		<!-- Rename matechat.dll to matechat.$(SanitizedVersion).dll -->
-		<Exec Command="if exist $(OutputPath)matechat.$(SanitizedVersion).dll del $(OutputPath)matechat.$(SanitizedVersion).dll" />
-		<Exec Command="move /Y $(OutputPath)matechat.dll $(OutputPath)matechat.$(SanitizedVersion).dll" />
+		<Exec Command="if exist $(OutputPath)matechat.$(FileVersion).dll del $(OutputPath)matechat.$(FileVersion).dll" />
+		<Exec Command="move /Y $(OutputPath)matechat.dll $(OutputPath)matechat.$(FileVersion).dll" />
 	</Target>
 
 	<Target Name="PostBuildCopy" AfterTargets="PostBuild">
@@ -903,6 +924,6 @@
 		<Exec Condition="Exists('$(TargetModsFolder)') And Exists('$(TargetModsFolder)\matechat*')" Command="del /Q &quot;$(TargetModsFolder)\matechat*&quot;" />
 
 		<!-- Copy the renamed file to the appropriate Mods folder -->
-		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$(SanitizedVersion).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
+		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$($(FileVersion)).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
 	</Target>
 </Project>
