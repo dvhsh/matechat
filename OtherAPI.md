@@ -10,7 +10,7 @@ This assumes that you have installed MelonLoader and MateChat, and that they are
 2. Once you are logged into the CloudFlare dashboard:
     - Click on AI on the left hand menu
         - The click on Workers API.
-    - Click on 'Use REST API' at the topof the screen.
+    - Click on 'Use REST API' at the top of the screen.
     - Click Create a Workers AI API Token
         - This will pop a window open on the right. You can change the name of the token here.
         - Click Create API Token at the bottom.
