@@ -839,6 +839,7 @@
 		<Compile Include="Constants.cs.bak" />
 		<Compile Include="Constants.cs" />
 		<Compile Include="Core.cs" />
+		<Compile Include="database\DatabaseAudioManager.cs" />
 		<Compile Include="database\DatabaseManager.cs" />
 		<Compile Include="feature\ChatFeature.cs" />
 		<Compile Include="Resource1.Designer.cs">
@@ -865,7 +866,6 @@
 		<Compile Include="util\audio\IAudioProcessor.cs" />
 		<Compile Include="util\audio\TTSEngine.cs" />
 		<Compile Include="util\audio\WAV.cs" />
-		<Compile Include="util\CloudflareUtil.cs" />
 		<Compile Include="util\IAIEngine.cs" />
 		<Compile Include="util\OpenAIEngine.cs" />
 			<Compile Remove="**/*.bak" />
@@ -933,6 +933,6 @@
 		<Exec Condition="Exists('$(TargetModsFolder)') And Exists('$(TargetModsFolder)\matechat*')" Command="del /Q &quot;$(TargetModsFolder)\matechat*&quot;" />
 
 		<!-- Copy the renamed file to the appropriate Mods folder -->
-		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$($(FileVersion)).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
+		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$(FileVersion).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
 	</Target>
 </Project>

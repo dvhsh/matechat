@@ -1,33 +1,76 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Text;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
-using System.Text;
 using MelonLoader;
+using Newtonsoft.Json;
+
 
 namespace matechat.util
 {
     public class TTSEngine : IAudioProcessor
     {
+        private readonly string _name;
+        private readonly string _endpoint;
+
+        public TTSEngine(string name, string endpoint)
+        {
+            _name = name;
+            _endpoint = endpoint;
+        }
+
+        /// <summary>
+        /// Unity Coroutine
+        /// </summary>
         public IEnumerator ProcessAudio(string text, System.Action<string, string> callback)
         {
-            if (!Config.ENABLE_TTS.Value)
+            var taskCompletionSource = new TaskCompletionSource<string>();
+
+            // execute `Task<string>` and wait
+            MelonCoroutines.Start(ProcessAudioCoroutine(text, taskCompletionSource));
+
+            while (!taskCompletionSource.Task.IsCompleted)
             {
-                MelonLogger.Msg("[TTS] TTS is disabled.");
-                callback(null, "TTS is disabled.");
-                yield break;
+                yield return null;
             }
 
-            string ttsApiUrl = Config.TTS_API_URL.Value;
-            string requestJson = JsonRequestBuilder.CreateTTSRequest(text);
+            if (taskCompletionSource.Task.Exception != null)
+            {
+                callback(null, taskCompletionSource.Task.Exception.Message);
+            }
+            else
+            {
+                callback(taskCompletionSource.Task.Result, null);
+            }
+        }
+
+        /// <summary>
+        /// `Task<string>` await handler
+        /// </summary>
+        public async Task<string> ProcessAudioAsync(string text)
+        {
+            var taskCompletionSource = new TaskCompletionSource<string>();
+
+            MelonCoroutines.Start(ProcessAudioCoroutine(text, taskCompletionSource));
+
+            return await taskCompletionSource.Task;
+        }
+
+        private IEnumerator ProcessAudioCoroutine(string text, TaskCompletionSource<string> tcs)
+        {
+            string requestJson = CreateTTSRequest(_name, text);
             byte[] jsonToSend = Encoding.UTF8.GetBytes(requestJson);
 
-            UnityWebRequest webRequest = new UnityWebRequest(ttsApiUrl, "POST");
+            UnityWebRequest webRequest = new UnityWebRequest(_endpoint, "POST");
             webRequest.uploadHandler = new UploadHandlerRaw(jsonToSend);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.SetRequestHeader("Content-Type", "application/json");
 
-            MelonLogger.Msg($"[TTS] Sending request to {Config.TTS_ENGINE.Value} TTS server...");
+            MelonLogger.Msg($"[TTS] Sending request to {_name} server...");
             MelonLogger.Msg($"[TTS] Request JSON: {requestJson}");
 
             yield return webRequest.SendWebRequest();
@@ -37,34 +80,54 @@ namespace matechat.util
                 byte[] audioData = webRequest.downloadHandler.data;
                 MelonLogger.Msg("[TTS] Successfully received audio response.");
 
-                yield return PlayAudioFromMemory(audioData);
-
-                callback(null, null);
+                string audioPath = SaveWavToFile(audioData);
+                tcs.SetResult(audioPath);
             }
             else
             {
                 MelonLogger.Error($"[TTS] Error: {webRequest.error}");
-                callback(null, webRequest.error);
+                tcs.SetException(new Exception(webRequest.error));
             }
+
+            webRequest.Dispose();
         }
 
-        private IEnumerator PlayAudioFromMemory(byte[] audioBytes)
+        /// <summary>
+        /// save audio data and return file path
+        /// </summary>
+        private string SaveWavToFile(byte[] audioData)
         {
-            MelonLogger.Msg("[TTS] Decoding audio from memory...");
+            string directoryPath = $"UserData/TTS_{Config.AI_NAME.Value}";
+            string filePath = $"{directoryPath}/{DateTime.Now:yyyyMMdd_HHmmss}.wav";
+            if (!System.IO.Directory.Exists(directoryPath))
+            {
+                System.IO.Directory.CreateDirectory(directoryPath);
+            }
+            System.IO.File.WriteAllBytes(filePath, audioData);
+            return filePath;
+        }
 
-            WAV wav = new WAV(audioBytes);
-            AudioClip clip = AudioClip.Create("TTS_Audio", wav.SampleCount, 1, wav.Frequency, false);
-            clip.SetData(wav.LeftChannel, 0);
-
-            GameObject audioObject = new GameObject("TempAudio");
-            AudioSource audioSource = audioObject.AddComponent<AudioSource>();
-            audioSource.clip = clip;
-            audioSource.Play();
-
-            MelonLogger.Msg("[TTS] Playing generated voice...");
-
-            yield return new WaitForSeconds(clip.length);
-            UnityEngine.Object.Destroy(audioObject);
+        private string CreateTTSRequest(string engineName, string text)
+        {
+            switch (engineName.ToLower())
+            {
+                case "gpt-sovits":
+                    var requestData = new Dictionary<string, object>
+                    {
+                        { "text", text },
+                        { "text_lang", Config.TTS_TEXT_LANG.Value },
+                        { "ref_audio_path", Config.TTS_REF_AUDIO_PATH.Value },
+                        { "prompt_text", Config.TTS_PROMPT_TEXT.Value },
+                        { "prompt_lang", Config.TTS_PROMPT_LANG.Value },
+                        { "text_split_method", Config.TTS_TEXT_SPLIT_METHOD.Value },
+                        { "batch_size", Config.TTS_BATCH_SIZE.Value },
+                        { "media_type", Config.TTS_MEDIA_TYPE.Value },
+                        { "streaming_mode", Config.TTS_STREAMING_MODE.Value }
+                    };
+                    return JsonConvert.SerializeObject(requestData);
+                default:
+                    throw new Exception($"{engineName} is not supported.");
+            }
         }
     }
 }

@@ -5,5 +5,6 @@ namespace matechat.util
     public interface IAudioProcessor
     {
         IEnumerator ProcessAudio(string text, System.Action<string, string> callback);
+        Task<string> ProcessAudioAsync(string text);
     }
 }

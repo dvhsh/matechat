@@ -68,7 +68,7 @@ namespace matechat
 
             ENABLE_TTS = category.CreateEntry("ENABLE_TTS", false);
             TTS_ENGINE = category.CreateEntry("TTS_ENGINE", "GPT-SoVITS");
-            TTS_API_URL = category.CreateEntry("TTS_API_URL", "http://localhost:9880/tts");
+            TTS_API_URL = category.CreateEntry("TTS_API_URL", "http://localhost:9880");
 
             TTS_TEXT_LANG = category.CreateEntry("TTS_TEXT_LANG", "ja");
             TTS_REF_AUDIO_PATH = category.CreateEntry("TTS_REF_AUDIO_PATH", "reference.wav");
