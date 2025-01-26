@@ -229,10 +229,6 @@ namespace matechat.feature
                 // Append the assistant's response to the chat history
                 AppendToChatHistory($"{Config.AI_NAME.Value}: {assistantMessage}");
 
-                if (Config.ENABLE_TTS.Value)
-                {
-                    MelonCoroutines.Start(PlayMessageCoroutine(responseText));
-                }
             }
             else
             {
@@ -243,6 +239,15 @@ namespace matechat.feature
             isWaitingForResponse = false;
             LimitChatHistory();
 
+
+            // run tts engine
+            if (task.Exception == null && task.IsCompletedSuccessfully)
+            {
+                if (Config.ENABLE_TTS.Value)
+                {
+                    MelonCoroutines.Start(PlayMessageCoroutine(task.Result));
+                }
+            }
         }
         private IEnumerator PlayMessageCoroutine(string responseText)
         {

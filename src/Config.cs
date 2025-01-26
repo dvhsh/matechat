@@ -66,6 +66,8 @@ namespace matechat
             AI_NAME = category.CreateEntry("AI_NAME", "Desktop Mate");
             NAME = category.CreateEntry("NAME", "USER");
 
+            BASE_URL = category.CreateEntry("BASE_URL", "");
+
             ENABLE_TTS = category.CreateEntry("ENABLE_TTS", false);
             TTS_ENGINE = category.CreateEntry("TTS_ENGINE", "GPT-SoVITS");
             TTS_API_URL = category.CreateEntry("TTS_API_URL", "http://localhost:9880");
@@ -110,9 +112,10 @@ namespace matechat
             if (string.IsNullOrEmpty(ENGINE_TYPE.Value) ||
                 (ENGINE_TYPE.Value.ToLower() != "cloudflare" &&
                  ENGINE_TYPE.Value.ToLower() != "openrouter" &&
-                 ENGINE_TYPE.Value.ToLower() != "openai"))
+                 ENGINE_TYPE.Value.ToLower() != "openai" &&
+                 ENGINE_TYPE.Value.ToLower() != "openaicompatible"))
             {
-                LogError($"Invalid ENGINE_TYPE: {ENGINE_TYPE.Value}. Supported: Cloudflare, OpenRouter, OpenAI.");
+                LogError($"Invalid ENGINE_TYPE: {ENGINE_TYPE.Value}. Supported: Cloudflare, OpenRouter, OpenAI, OpenAICompatible.");
             }
 
             // API_KEY Validation
@@ -132,7 +135,7 @@ namespace matechat
             // SYSTEM_PROMPT Validation
             if (string.IsNullOrEmpty(SYSTEM_PROMPT.Value))
                 LogError("SYSTEM_PROMPT is empty!");
-            else if (SYSTEM_PROMPT.Value.Length > 4096)
+            else if (SYSTEM_PROMPT.Value.Length > 4096 && ENGINE_TYPE.Value.ToLower() != "openaicompatible")
                 LogError("SYSTEM_PROMPT exceeds the maximum length of 4096 characters!");
 
             // AI_NAME Validation
@@ -141,6 +144,11 @@ namespace matechat
             else if (AI_NAME.Value.Length > 32)
                 LogError("AI_NAME is too long (maximum 32 characters)!");
 
+
+            if (TTS_ENGINE.Value.ToLower() == "gpt-sovits" && TTS_STREAMING_MODE.Value)
+            {
+                LogError("GPT-Sovits does not fully support streaming mode. Please set TTS_STREAMING_MODE false");
+            }
             // Chat Window Configuration Validation
             ValidateRange(CHAT_WINDOW_WIDTH.Value, 200, Screen.width, "chat window width");
             ValidateRange(CHAT_WINDOW_HEIGHT.Value, 200, Screen.height, "chat window height");

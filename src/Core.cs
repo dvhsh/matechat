@@ -21,11 +21,8 @@ namespace matechat
         public static DatabaseManager databaseManager;
         public static DatabaseAudioManager databaseAudioManager;
 
-        private static IAIEngine aiEngine;
-
         private static AIEngineManager aiEngineManager;
-
-        private static IAudioProcessor audioEngineManager;
+        private static AudioEngineManager audioEngineManager;
 
         public override void OnApplicationStart()
         {
@@ -153,40 +150,61 @@ namespace matechat
 
         private static void InitializeAudioEngines()
         {
-            var engines = new List<(string Name, IAIEngine Engine)>();
-            string engineType = Config.TTS_ENGINE.Value?.ToLower();
+            var engines = new List<(string Name, IAudioEngine ttsEngine)>();
 
             try
             {
                 if (Config.ENABLE_TTS.Value)
                 {
-                    switch (engineType)
-                    {
-                        case "gpt-sovits":
-                            engines.Add(((string Name, IAIEngine Engine))(
-                                "GPT-SoVITS",
-                                new TTSEngine(
-                                    "GPT-SoVITS",
-                                    $"{Config.TTS_API_URL.Value}/tts"
-                                )
-                            ));
-                            MelonLogger.Msg("Using GPT-SoVITS for TTS.");
-                            break;
 
+                    string endpoint = null;
+                    switch (Config.TTS_ENGINE.Value)
+                    {
+                        case "GPT-SoVITS":
+                            endpoint = $"{Config.TTS_API_URL.Value}/tts";
+                            break;
+                        // TODO: add other engine features
                         default:
-                            MelonLogger.Error($"Unsupported TTS engine type: {Config.TTS_ENGINE.Value}");
-                            throw new System.Exception("Invalid TTS engine configuration.");
+                            throw new System.Exception($"Unsupported TTS engine: {Config.TTS_ENGINE.Value}");
+                    }
+
+                    // 이제 스트리밍 모드인지 아닌지에 따라 등록
+                    if (Config.TTS_STREAMING_MODE.Value)
+                    {
+                        // 스트리밍 엔진
+                        engines.Add((
+                            $"{Config.TTS_ENGINE.Value} (Streaming)", // 엔진 이름
+                            new StreamingTTSEngine(Config.TTS_ENGINE.Value, endpoint)
+                        ));
+                        MelonLogger.Msg($"[AudioEngine] Added streaming TTS engine: {Config.TTS_ENGINE.Value}");
+                    }
+                    else
+                    {
+                        // 일반 TTS
+                        engines.Add((
+                            Config.TTS_ENGINE.Value, // 엔진 이름
+                            new TTSEngine(Config.TTS_ENGINE.Value, endpoint)
+                        ));
+                        MelonLogger.Msg($"[AudioEngine] Added non-streaming TTS engine: {Config.TTS_ENGINE.Value}");
                     }
                 }
-                //else if (Config.ENABLE_AUDIO_MODEL.Value)
-                //{
-                //    audioEngineManager = new AudioModelEngine();
-                //    MelonLogger.Msg("Using Audio Model for sound processing.");
-                //}
-                //else
-                //{
-                //    MelonLogger.Msg("No Audio Engine enabled.");
-                //}
+                else
+                {
+                    MelonLogger.Msg("[AudioEngine] TTS is disabled in config.");
+                }
+
+                if (engines.Count == 0)
+                {
+                    audioEngineManager = null;
+                    MelonLogger.Warning("No TTS engines were initialized. AudioEngineManager is set to null.");
+                    return;
+                }
+
+                audioEngineManager = new AudioEngineManager(
+                    defaultEngine: engines[0].Name,
+                    engines: engines.ToArray()
+                );
+                MelonLogger.Msg($"[AudioEngine] AudioEngineManager initialized with default engine: {engines[0].Name}");
             }
             catch (System.Exception ex)
             {
@@ -194,6 +212,7 @@ namespace matechat
                 throw;
             }
         }
+
         public static void ReloadAudioEngine()
         {
             try
@@ -240,7 +259,7 @@ namespace matechat
             return aiEngineManager;
         }
 
-        public static IAudioProcessor GetAudioEngine()
+        public static AudioEngineManager GetAudioEngine()
         {
             if (audioEngineManager == null)
             {

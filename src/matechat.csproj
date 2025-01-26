@@ -848,6 +848,13 @@
 		  <DependentUpon>Resource1.resx</DependentUpon>
 		</Compile>
 		<Compile Include="sdk\Feature.cs" />
+		<Compile Include="util\audio\AudioEngineManager.cs" />
+		<Compile Include="util\audio\AudioStreamPlayer.cs" />
+		<Compile Include="util\audio\AudioStreamPlayerWrapper.cs" />
+		<Compile Include="util\audio\IAudioStreamPlayer.cs" />
+		<Compile Include="util\audio\StreamingDownloadHandler.cs" />
+		<Compile Include="util\audio\StreamingTTSEngine.cs" />
+		<Compile Include="util\audio\TTSRequestBuilder.cs" />
 		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid-Miku.png" />
 		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid.png" />
 		<EmbeddedResource Include="ui\assets\OpenConfig-Vocaloid-Miku.png" />
@@ -861,11 +868,8 @@
 		<Compile Include="util\CloudflareEngine.cs" />
 		<Compile Include="util\CloudflareWrapper.cs" />
 		<Compile Include="util\EngineHandle.cs" />
-		<Compile Include="util\audio\AudioManager.cs" />
-		<Compile Include="util\audio\AudioModelEngine.cs" />
-		<Compile Include="util\audio\IAudioProcessor.cs" />
+		<Compile Include="util\audio\IAudioEngine.cs" />
 		<Compile Include="util\audio\TTSEngine.cs" />
-		<Compile Include="util\audio\WAV.cs" />
 		<Compile Include="util\IAIEngine.cs" />
 		<Compile Include="util\OpenAIEngine.cs" />
 			<Compile Remove="**/*.bak" />
