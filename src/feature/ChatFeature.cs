@@ -189,7 +189,7 @@ namespace matechat.feature
             string userMessage = inputText;
             inputText = string.Empty;
             isWaitingForResponse = true;
-            MelonCoroutines.Start(SendMessageCoroutine(userMessage));
+            MelonCoroutines.Start(SendMessageCoroutine(userMessage));            
         }
 
 
@@ -228,6 +228,7 @@ namespace matechat.feature
                 string assistantMessage = task.Result;
                 // Append the assistant's response to the chat history
                 AppendToChatHistory($"{Config.AI_NAME.Value}: {assistantMessage}");
+
             }
             else
             {
@@ -237,7 +238,65 @@ namespace matechat.feature
             // Reset the waiting state
             isWaitingForResponse = false;
             LimitChatHistory();
+
+
+            // run tts engine
+            if (task.Exception == null && task.IsCompletedSuccessfully)
+            {
+                if (Config.ENABLE_TTS.Value)
+                {
+                    MelonCoroutines.Start(PlayMessageCoroutine(task.Result));
+                }
+            }
         }
+        private IEnumerator PlayMessageCoroutine(string responseText)
+        {
+            var audioManager = Core.GetAudioEngine();
+            var taskCompletionSource = new TaskCompletionSource<string>();
+
+            MelonLogger.Msg("[TTS] Converting AI response to speech...");
+
+            MelonCoroutines.Start(ProcessAudioCoroutine(responseText, taskCompletionSource));
+
+            while (!taskCompletionSource.Task.IsCompleted)
+            {
+                yield return null;
+            }
+
+            if (taskCompletionSource.Task.Exception != null)
+            {
+                MelonLogger.Error($"[TTS] Failed to play: {taskCompletionSource.Task.Exception.Message}");
+            }
+            else
+            {
+                string audioPath = taskCompletionSource.Task.Result;
+                MelonLogger.Msg($"[TTS] Successfully played audio from path: {audioPath}");
+
+                Core.databaseAudioManager.AddAudioPath(responseText, audioPath);
+            }
+        }
+        private IEnumerator ProcessAudioCoroutine(string text, TaskCompletionSource<string> tcs)
+        {
+            var audioManager = Core.GetAudioEngine();
+
+            var task = audioManager.ProcessAudioAsync(text);
+
+            while (!task.IsCompleted)
+            {
+                yield return null;
+            }
+
+            if (task.Exception != null)
+            {
+                tcs.SetException(task.Exception);
+            }
+            else
+            {
+                tcs.SetResult(task.Result);
+            }
+        }
+
+
 
         private void LimitChatHistory()
         {

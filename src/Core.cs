@@ -19,8 +19,10 @@ namespace matechat
         private bool isInitialized;
 
         public static DatabaseManager databaseManager;
+        public static DatabaseAudioManager databaseAudioManager;
 
         private static AIEngineManager aiEngineManager;
+        private static AudioEngineManager audioEngineManager;
 
         public override void OnApplicationStart()
         {
@@ -32,6 +34,8 @@ namespace matechat
                 // Initialize AI engines
                 InitializeAIEngines();
 
+                // initialize the Audio engine based on the config
+                InitializeAudioEngines();
 
                 //Initialize the Database Engine
                 InitializeDBEngine();
@@ -61,6 +65,7 @@ namespace matechat
         private void InitializeDBEngine()
         {
             databaseManager = new DatabaseManager("UserData\\ChatLog.db");
+            databaseAudioManager = new DatabaseAudioManager("UserData\\AudioLog.db");
         }
 
         private static void InitializeAIEngines()
@@ -106,6 +111,17 @@ namespace matechat
                         MelonLogger.Msg("Added OpenRouter engine.");
                         break;
 
+                    case "openaicompatible":
+                        engines.Add((
+                            "OpenAICompatible",
+                            new OpenAIEngine(
+                                Config.API_KEY.Value,
+                                $"{Config.BASE_URL.Value}/v1/chat/completions"
+                            )
+                        ));
+                        MelonLogger.Msg("Added OpenAICompatible engine.");
+                        break;
+
                     default:
                         throw new System.Exception($"Unsupported AI engine type: {engineType}");
                 }
@@ -129,6 +145,84 @@ namespace matechat
             {
                 MelonLogger.Error($"Failed to initialize AI engines: {ex.Message}");
                 throw;
+            }
+        }
+
+        private static void InitializeAudioEngines()
+        {
+            var engines = new List<(string Name, IAudioEngine ttsEngine)>();
+
+            try
+            {
+                if (Config.ENABLE_TTS.Value)
+                {
+
+                    string endpoint = null;
+                    switch (Config.TTS_ENGINE.Value)
+                    {
+                        case "GPT-SoVITS":
+                            endpoint = $"{Config.TTS_API_URL.Value}/tts";
+                            break;
+                        // TODO: add other engine features
+                        default:
+                            throw new System.Exception($"Unsupported TTS engine: {Config.TTS_ENGINE.Value}");
+                    }
+
+                    // 이제 스트리밍 모드인지 아닌지에 따라 등록
+                    if (Config.TTS_STREAMING_MODE.Value)
+                    {
+                        // 스트리밍 엔진
+                        engines.Add((
+                            $"{Config.TTS_ENGINE.Value} (Streaming)", // 엔진 이름
+                            new StreamingTTSEngine(Config.TTS_ENGINE.Value, endpoint)
+                        ));
+                        MelonLogger.Msg($"[AudioEngine] Added streaming TTS engine: {Config.TTS_ENGINE.Value}");
+                    }
+                    else
+                    {
+                        // 일반 TTS
+                        engines.Add((
+                            Config.TTS_ENGINE.Value, // 엔진 이름
+                            new TTSEngine(Config.TTS_ENGINE.Value, endpoint)
+                        ));
+                        MelonLogger.Msg($"[AudioEngine] Added non-streaming TTS engine: {Config.TTS_ENGINE.Value}");
+                    }
+                }
+                else
+                {
+                    MelonLogger.Msg("[AudioEngine] TTS is disabled in config.");
+                }
+
+                if (engines.Count == 0)
+                {
+                    audioEngineManager = null;
+                    MelonLogger.Warning("No TTS engines were initialized. AudioEngineManager is set to null.");
+                    return;
+                }
+
+                audioEngineManager = new AudioEngineManager(
+                    defaultEngine: engines[0].Name,
+                    engines: engines.ToArray()
+                );
+                MelonLogger.Msg($"[AudioEngine] AudioEngineManager initialized with default engine: {engines[0].Name}");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to initialize Audio Engine: {ex.Message}");
+                throw;
+            }
+        }
+
+        public static void ReloadAudioEngine()
+        {
+            try
+            {
+                InitializeAudioEngines();
+                MelonLogger.Msg("Audio engine reloaded successfully.");
+            }
+            catch (System.Exception ex)
+            {
+                MelonLogger.Error($"Failed to reload Audio engine: {ex.Message}");
             }
         }
 
@@ -163,6 +257,15 @@ namespace matechat
                 throw new System.Exception("AIEngineManager is not initialized.");
             }
             return aiEngineManager;
+        }
+
+        public static AudioEngineManager GetAudioEngine()
+        {
+            if (audioEngineManager == null)
+            {
+                throw new System.Exception("Audio engine is not initialized.");
+            }
+            return audioEngineManager;
         }
 
         public override void OnLateUpdate()

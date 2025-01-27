@@ -1,3 +1,4 @@
+using Il2CppSteamworks;
 using MelonLoader;
 using System.Collections;
 using UnityEngine;
@@ -16,6 +17,28 @@ namespace matechat
         public static MelonPreferences_Entry<string> SYSTEM_PROMPT;
         public static MelonPreferences_Entry<string> AI_NAME;
         public static MelonPreferences_Entry<string> NAME; // The Name that the AI Will know you by 
+
+        // new feature for openai compatible 
+        public static MelonPreferences_Entry<string> BASE_URL;
+
+        // Audio Features
+        public static MelonPreferences_Entry<bool> ENABLE_TTS;
+        public static MelonPreferences_Entry<string> TTS_ENGINE;
+        public static MelonPreferences_Entry<string> TTS_API_URL;
+
+        public static MelonPreferences_Entry<string> TTS_TEXT_LANG;
+        public static MelonPreferences_Entry<string> TTS_REF_AUDIO_PATH;
+        public static MelonPreferences_Entry<string> TTS_PROMPT_TEXT;
+        public static MelonPreferences_Entry<string> TTS_PROMPT_LANG;
+        public static MelonPreferences_Entry<string> TTS_TEXT_SPLIT_METHOD;
+        public static MelonPreferences_Entry<int> TTS_BATCH_SIZE;
+        public static MelonPreferences_Entry<string> TTS_MEDIA_TYPE;
+        public static MelonPreferences_Entry<bool> TTS_STREAMING_MODE;
+
+        public static MelonPreferences_Entry<bool> ENABLE_AUDIO_MODEL;
+        public static MelonPreferences_Entry<string> AUDIO_MODEL_API_URL;
+        public static MelonPreferences_Entry<string> AUDIO_MODEL_ENGINE;
+
 
         public static MelonPreferences_Entry<int> CHAT_WINDOW_WIDTH;
         public static MelonPreferences_Entry<int> CHAT_WINDOW_HEIGHT;
@@ -42,6 +65,25 @@ namespace matechat
             );
             AI_NAME = category.CreateEntry("AI_NAME", "Desktop Mate");
             NAME = category.CreateEntry("NAME", "USER");
+
+            BASE_URL = category.CreateEntry("BASE_URL", "");
+
+            ENABLE_TTS = category.CreateEntry("ENABLE_TTS", false);
+            TTS_ENGINE = category.CreateEntry("TTS_ENGINE", "GPT-SoVITS");
+            TTS_API_URL = category.CreateEntry("TTS_API_URL", "http://localhost:9880");
+
+            TTS_TEXT_LANG = category.CreateEntry("TTS_TEXT_LANG", "ja");
+            TTS_REF_AUDIO_PATH = category.CreateEntry("TTS_REF_AUDIO_PATH", "reference.wav");
+            TTS_PROMPT_TEXT = category.CreateEntry("TTS_PROMPT_TEXT", "1杯の珈琲と、 至福の時をアナタに…。");
+            TTS_PROMPT_LANG = category.CreateEntry("TTS_PROMPT_LANG", "ja");
+            TTS_TEXT_SPLIT_METHOD = category.CreateEntry("TTS_TEXT_SPLIT_METHOD", "cut5");
+            TTS_BATCH_SIZE = category.CreateEntry("TTS_BATCH_SIZE", 1);
+            TTS_MEDIA_TYPE = category.CreateEntry("TTS_MEDIA_TYPE", "wav");
+            TTS_STREAMING_MODE = category.CreateEntry("TTS_STREAMING_MODE", false);
+
+            // for 'omni' model, such as gpt-4o, gemini
+            ENABLE_AUDIO_MODEL = category.CreateEntry("ENABLE_AUDIO_MODEL", false);
+            //AUDIO_MODEL_API_URL = category.CreateEntry("AUDIO", "http://localhost:8000/v1/audio-model");
 
             CHAT_WINDOW_WIDTH = category.CreateEntry("CHAT_WINDOW_WIDTH", 400);
             CHAT_WINDOW_HEIGHT = category.CreateEntry("CHAT_WINDOW_HEIGHT", 500);
@@ -70,9 +112,10 @@ namespace matechat
             if (string.IsNullOrEmpty(ENGINE_TYPE.Value) ||
                 (ENGINE_TYPE.Value.ToLower() != "cloudflare" &&
                  ENGINE_TYPE.Value.ToLower() != "openrouter" &&
-                 ENGINE_TYPE.Value.ToLower() != "openai"))
+                 ENGINE_TYPE.Value.ToLower() != "openai" &&
+                 ENGINE_TYPE.Value.ToLower() != "openaicompatible"))
             {
-                LogError($"Invalid ENGINE_TYPE: {ENGINE_TYPE.Value}. Supported: Cloudflare, OpenRouter, OpenAI.");
+                LogError($"Invalid ENGINE_TYPE: {ENGINE_TYPE.Value}. Supported: Cloudflare, OpenRouter, OpenAI, OpenAICompatible.");
             }
 
             // API_KEY Validation
@@ -82,6 +125,8 @@ namespace matechat
             // ACCOUNT_ID Validation for Cloudflare
             if (ENGINE_TYPE.Value == "Cloudflare" && string.IsNullOrEmpty(ACCOUNT_ID.Value))
                 LogError("ACCOUNT_ID is required for Cloudflare!");
+            else if (ENGINE_TYPE.Value == "OpenAICompatible" && string.IsNullOrEmpty(BASE_URL.Value))
+                LogError("BASE_URL is required for OpenAICompatible.");
 
             // MODEL_NAME Validation
             if (string.IsNullOrEmpty(MODEL_NAME.Value))
@@ -90,7 +135,7 @@ namespace matechat
             // SYSTEM_PROMPT Validation
             if (string.IsNullOrEmpty(SYSTEM_PROMPT.Value))
                 LogError("SYSTEM_PROMPT is empty!");
-            else if (SYSTEM_PROMPT.Value.Length > 4096)
+            else if (SYSTEM_PROMPT.Value.Length > 4096 && ENGINE_TYPE.Value.ToLower() != "openaicompatible")
                 LogError("SYSTEM_PROMPT exceeds the maximum length of 4096 characters!");
 
             // AI_NAME Validation
@@ -99,6 +144,11 @@ namespace matechat
             else if (AI_NAME.Value.Length > 32)
                 LogError("AI_NAME is too long (maximum 32 characters)!");
 
+
+            if (TTS_ENGINE.Value.ToLower() == "gpt-sovits" && TTS_STREAMING_MODE.Value)
+            {
+                LogError("GPT-Sovits does not fully support streaming mode. Please set TTS_STREAMING_MODE false");
+            }
             // Chat Window Configuration Validation
             ValidateRange(CHAT_WINDOW_WIDTH.Value, 200, Screen.width, "chat window width");
             ValidateRange(CHAT_WINDOW_HEIGHT.Value, 200, Screen.height, "chat window height");
@@ -110,6 +160,46 @@ namespace matechat
             {
                 if (value < min || value > max)
                     LogError($"Invalid {name}: {value}. Should be between {min} and {max}!");
+            }
+        }
+
+        public static string GetAPIUrl()
+        {
+            switch (ENGINE_TYPE.Value)
+            {
+                case "Cloudflare":
+                    return $"https://api.cloudflare.com/client/v4/accounts/{ACCOUNT_ID.Value}/ai/run/@cf/meta/{MODEL_NAME.Value}";
+                case "OpenRouter":
+                    return "https://openrouter.ai/api/v1/chat/completions";  // Fixed
+                                                                             // endpoint
+                case "OpenAI":
+                    return "https://api.openai.com/v1/chat/completions";  // Fixed
+                                                                          // endpoint
+                default:
+                    throw new System.Exception(
+                        $"Unsupported ENGINE_TYPE: {ENGINE_TYPE.Value}");
+            }
+        }
+
+        public static void DisplayConfigurationInstructions()
+        {
+            switch (ENGINE_TYPE.Value)
+            {
+                case "Cloudflare":
+                    MelonLogger.Msg(
+                        "Cloudflare Configuration: Provide your ACCOUNT_ID and API_KEY. Select a model like llama-3.1-8b-instruct.");
+                    break;
+                case "OpenRouter":
+                    MelonLogger.Msg(
+                        "OpenRouter Configuration: Provide your API_KEY. No ACCOUNT_ID is required. Select models like gpt-3.5-turbo.");
+                    break;
+                case "OpenAI":
+                    MelonLogger.Msg(
+                        "OpenAI Configuration: Provide your API_KEY. No ACCOUNT_ID is required. Use models like gpt-3.5-turbo or gpt-4.");
+                    break;
+                default:
+                    MelonLogger.Error($"Unsupported ENGINE_TYPE: {ENGINE_TYPE.Value}");
+                    break;
             }
         }
 

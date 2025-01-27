@@ -416,6 +416,9 @@
 		<Reference Include="UnityEngine.XRModule">
 			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.XRModule.dll</HintPath>
 		</Reference>
+		<Reference Include="UnityEngine.AudioModule">
+			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\Il2CppAssemblies\UnityEngine.AudioModule.dll</HintPath>
+		</Reference>
 		<Reference Include="MelonLoader">
 			<HintPath>C:\Program Files (x86)\Steam\steamapps\common\Desktop Mate\MelonLoader\net6\MelonLoader.dll</HintPath>
 		</Reference>
@@ -836,6 +839,7 @@
 		<Compile Include="Constants.cs.bak" />
 		<Compile Include="Constants.cs" />
 		<Compile Include="Core.cs" />
+		<Compile Include="database\DatabaseAudioManager.cs" />
 		<Compile Include="database\DatabaseManager.cs" />
 		<Compile Include="feature\ChatFeature.cs" />
 		<Compile Include="Resource1.Designer.cs">
@@ -844,6 +848,13 @@
 		  <DependentUpon>Resource1.resx</DependentUpon>
 		</Compile>
 		<Compile Include="sdk\Feature.cs" />
+		<Compile Include="util\audio\AudioEngineManager.cs" />
+		<Compile Include="util\audio\AudioStreamPlayer.cs" />
+		<Compile Include="util\audio\AudioStreamPlayerWrapper.cs" />
+		<Compile Include="util\audio\IAudioStreamPlayer.cs" />
+		<Compile Include="util\audio\StreamingDownloadHandler.cs" />
+		<Compile Include="util\audio\StreamingTTSEngine.cs" />
+		<Compile Include="util\audio\TTSRequestBuilder.cs" />
 		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid-Miku.png" />
 		<EmbeddedResource Include="ui\assets\MateChat-Vocaloid.png" />
 		<EmbeddedResource Include="ui\assets\OpenConfig-Vocaloid-Miku.png" />
@@ -857,6 +868,8 @@
 		<Compile Include="util\CloudflareEngine.cs" />
 		<Compile Include="util\CloudflareWrapper.cs" />
 		<Compile Include="util\EngineHandle.cs" />
+		<Compile Include="util\audio\IAudioEngine.cs" />
+		<Compile Include="util\audio\TTSEngine.cs" />
 		<Compile Include="util\IAIEngine.cs" />
 		<Compile Include="util\OpenAIEngine.cs" />
 			<Compile Remove="**/*.bak" />
@@ -924,6 +937,6 @@
 		<Exec Condition="Exists('$(TargetModsFolder)') And Exists('$(TargetModsFolder)\matechat*')" Command="del /Q &quot;$(TargetModsFolder)\matechat*&quot;" />
 
 		<!-- Copy the renamed file to the appropriate Mods folder -->
-		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$($(FileVersion)).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
+		<Exec Condition="Exists('$(TargetModsFolder)')" Command="xcopy &quot;$(OutputPath)matechat.$(FileVersion).dll&quot; &quot;$(TargetModsFolder)&quot; /Y" />
 	</Target>
 </Project>
