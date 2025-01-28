@@ -263,7 +263,8 @@ namespace matechat
         {
             if (audioEngineManager == null)
             {
-                throw new System.Exception("Audio engine is not initialized.");
+                InitializeAudioEngines();
+               // throw new System.Exception("Audio engine is not initialized.");
             }
             return audioEngineManager;
         }
