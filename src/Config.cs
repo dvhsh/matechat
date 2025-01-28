@@ -209,6 +209,11 @@ namespace matechat
 
             if (TestConfig())
             {
+                if (ENABLE_TTS.Value == true)
+                {
+                    Core.GetAudioEngine();
+                }
+
                 if (lastUsedSystemPrompt != SYSTEM_PROMPT.Value || lastUsedEngineType != ENGINE_TYPE.Value)
                 {
                     MelonLogger.Msg("Engine or system prompt changed. Reloading engine...");
