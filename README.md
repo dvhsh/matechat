@@ -1,66 +1,107 @@
 <img src="matechat.png" alt="MateChat Banner" width="100%">
 
 # MateChat
-> A MelonLoader mod that lets you chat with your Desktop Mate using AI! ♪
+> A MelonLoader mod that enables AI chat and voice interactions with your Desktop Mate! ♪
 
-MateChat adds a cute chat interface to Desktop Mate, powered by Cloudflare's AI Workers running the Llama 2 language model. Have natural conversations with your mate in an adorable interface designed to match Desktop Mate's aesthetic~ ✧
+MateChat now supports multiple AI language models and text-to-speech capabilities, allowing for even more immersive interactions with your desktop companion~ ✧
 
 ## ✨ Features
-- Chat with your Desktop Mate using AI
-- Cute and minimal interface that matches the game's style
-- Easy to setup and configure
-- Customizable chat window and font size
-- Quick access through the mate's menu or keyboard shortcut
+- Chat with your Desktop Mate using various AI providers
+- Text-to-Speech support powered by GPT-SoVITS
+- Cute and minimal interface matching the game's aesthetic
+- Highly configurable settings for both chat and voice
+- Quick access through mate's menu or keyboard shortcut
 
 ## 🎀 Installation
 
-1. **Setup MelonLoader**
-   - Install the latest [MelonLoader](https://github.com/LavaGang/MelonLoader/)
-   - Run Desktop Mate once and exit
+1. **Install Desktop Mate & MelonLoader**
+   - Download the latest `Desktop.Mate.zip`
+   - Extract the contents to match your Steam installation directory
+   - The extracted folder should contain:
+     - `Mods/` directory with the MateChat dll
+     - `UserLibs/` with required libraries
 
-2. **Install MateChat**
-   - Download the latest `matechat.dll` from [Releases](https://github.com/dvhsh/matechat/releases)
-   - Place it in your Desktop Mate's Mods folder
-
-3. **Configure the Mod**
+2. **Configure MateChat**
    - Start Desktop Mate
    - Right-click and select MateChat from the menu
-   - Click "Open Config" and add your Cloudflare credentials:
-     - `API_KEY` (your API token)
-     - `ACCOUNT_ID` (your Cloudflare account id)
-   - Click "Reload Config"
+   - Configure your settings in `UserData/MateChat.cfg`
 
-Need help setting up your Cloudflare AI Worker? Follow this [quick guide](https://developers.cloudflare.com/workers-ai/get-started/rest-api/)!
+3. **Setup Text-to-Speech (Optional)**
+   - Clone [GPT-SoVITS repository](https://github.com/RVC-Boss/GPT-SoVITS)
+   - Install [pretrained models](https://github.com/RVC-Boss/GPT-SoVITS?tab=readme-ov-file#pretrained-models)
+   - Run `pip install -r requirements.txt`
+   - Place a reference audio clip (<10s) in the root directory as `reference.wav`
+   - Start the TTS server: `python api_v2.py`
 
-## Other [AI Providers](OtherAPI.md)
-
-## Example Config
-```
+## 📝 Configuration
+```ini
 [MateChat]
+# Core Settings
 CHAT_KEYBIND = "F8"
 ENGINE_TYPE = "Cloudflare"
-ACCOUNT_ID = ""
-API_KEY = ""
-MODEL_NAME = "llama-3-8b-instruct"
-SYSTEM_PROMPT = "You are a cheerful digital companion inspired by Hatsune Miku!"
-AI_NAME = "Desktop Mate"
+API_KEY = "your_api_key"
+ACCOUNT_ID = "your_account_id"  # Optional for OpenRouter/OpenAI
+MODEL_NAME = "llama-3.1-8b-instruct"
+NAME = "USER"
+AI_NAME = "Miku"
+
+# System Prompt
+SYSTEM_PROMPT = "You are a cheerful digital companion inspired by Hatsune Miku! Keep responses brief and energetic..."
+
+# UI Settings
 CHAT_WINDOW_WIDTH = 400
 CHAT_WINDOW_HEIGHT = 500
 CHAT_WINDOW_X = 20
 CHAT_WINDOW_Y = 20
-CHAT_WINDOW_FONT_SIZE = 16
+CHAT_WINDOW_FONT_SIZE = 24
+
+# Advanced Features
+ENABLE_AUDIO_MODEL = false
+BASE_URL = ""
 ```
 
+## 🎤 Text-to-Speech Configuration
+
+Enable and configure TTS in your `MateChat.cfg`:
+
+```ini
+# Text-to-Speech Settings
+ENABLE_TTS = true
+ENABLE_AUDIO_MODEL = false      # Not yet supported, placeholder
+
+TTS_ENGINE = "GPT-SoVITS"      # Currently only GPT-SoVITS is tested
+TTS_API_URL = "http://localhost:9880"  # Default GPT-SoVITS server URL
+
+# Voice Configuration
+TTS_TEXT_LANG = "auto"         # Language detection for input text
+TTS_REF_AUDIO_PATH = "reference.wav"   # Reference voice file (on server side)
+TTS_PROMPT_TEXT = "[voice of reference.wav]"
+TTS_PROMPT_LANG = "ja"         # Reference language (ja/zh/en/etc)
+
+# Processing Settings
+TTS_TEXT_SPLIT_METHOD = "cut5"
+TTS_BATCH_SIZE = 1
+TTS_MEDIA_TYPE = "wav"
+TTS_STREAMING_MODE = false      # Streaming support pending GPT-SoVITS updates
+```
+
+### Important Notes:
+- The `reference.wav` path is relative to your GPT-SoVITS server directory
+- Use a clear, high-quality voice sample under 10 seconds for best results
+- Keep the GPT-SoVITS server running while using TTS features
+- Streaming mode is implemented but waiting on full GPT-SoVITS support
+
 ## 💭 Coming Soon
-- Support for multiple LLM APIs
-- Visual improvements including speech bubbles
-- Desktop Mate animations integration
-- And more! ♪
+- UI overhaul with improved aesthetics
+- Speech bubble integration
+- Enhanced character animations
+- Speech-to-text capabilities
+- And more exciting features! ♪
 
 ## 🌟 Support
 Join our [Discord server][discord-url] for help, updates, and cute chat screenshots!
 
-The mod automatically tests your config on startup and reloads, checking if your worker is setup correctly. Check the MelonLoader console for detailed feedback~
+The mod performs automatic configuration testing on startup and reload to ensure everything is working correctly. Check the MelonLoader console for detailed feedback~
 
 ---
 Made with ♥ for Desktop Mate
