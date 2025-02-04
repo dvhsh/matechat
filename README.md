@@ -13,6 +13,7 @@ MateChat now supports multiple AI language models and text-to-speech capabilitie
 - Quick access through mate's menu or keyboard shortcut
 
 ## 🎀 Installation
+**More detailed instructions (step by step) can be found in the [Wiki](https://github.com/dvhsh/matechat/wiki).
 
 1. **Install Desktop Mate & MelonLoader**
    - Download the latest `Desktop.Mate.zip`
